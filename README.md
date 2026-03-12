@@ -1,7 +1,7 @@
-# SRB MBDT Validierungsengine v1.4
+# SRB MBDT Validierungsengine v1.5
 
 **Single Resolution Board – Minimum Bail-in Data Template Validator**
-MBDT 2.1 | B01–B14 | EBA DPM 4.2 | L1/L2/CL/DPM/CROSS-Regeln | **252 Regeln** | DE Country Annex
+MBDT 2.1 | B01–B14 | EBA DPM 4.2 | L1/L2/CL/DPM/CROSS-Regeln | **394 Regeln** | DE Country Annex
 
 ---
 
@@ -84,7 +84,7 @@ MBDT_Validierungsengine_v1.1/
 | CL    | 26     | Codelisten-Prüfungen (24 Codelisten, 126 Werte) |
 | DPM   | 83     | EBA DPM 4.2 Datentypen & Formate |
 | CROSS | 10     | Cross-Template + MREL-Konsistenz |
-| **Gesamt** | **230** | |
+| **Gesamt** | **394** | |
 
 ---
 

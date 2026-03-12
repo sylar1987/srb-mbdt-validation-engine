@@ -1,6 +1,6 @@
 """
 SRB Minimum Bail-in Data Template (MBDT) Validierungsengine
-Version: 1.4  (DE Country Annex + CL-Erweiterung)
+Version: 1.5  (Alle Regelebenen vollständig: L1/L2/CL/DPM/CROSS/DQ + B01/B05/B06/B99)
 Quelle:  SRB MBDT (published 2024-11-05) + EBA DPM 4.2 + DE Country Annex 2024-11-05
 
 Regeltypen:
@@ -1357,7 +1357,7 @@ class MBDTValidator:
             ("Gesamt-Befunde",        str(summary.get("total", 0))),
             ("  davon FEHLER",        str(summary.get("errors", 0))),
             ("  davon WARNUNGEN",     str(summary.get("warnings", 0))),
-            ("Engine-Version",        "1.4 (SRB MBDT + EBA DPM 4.2 + DE Country Annex + DQ)"),
+            ("Engine-Version",        "1.5 (SRB MBDT + EBA DPM 4.2 + DE Country Annex + DQ + vollständige B-Template-Abdeckung)"),
         ]
         for i, (key, val) in enumerate(meta, start=5):
             ws_cover.row_dimensions[i].height = 20
@@ -1597,7 +1597,7 @@ class MBDTValidator:
             "DPM": "DPM – Datentypen (EBA DPM 4.2)",
             "CROSS": "CROSS – Übergreifend + MREL",
             "SYSTEM": "SYSTEM – Technisch",
-            "DQ": "DQ – Datenqualität (v1.4)",
+            "DQ": "DQ – Datenqualität (v1.5)",
         }
         by_level = summary.get("by_rule_level", {})
         for i, (lv, count) in enumerate(sorted(by_level.items())):

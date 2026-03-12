@@ -31,7 +31,7 @@ from mbdt_validator import MBDTValidator
 
 def main():
     parser = argparse.ArgumentParser(
-        description="SRB MBDT Validierungsengine (v1.4)",
+        description="SRB MBDT Validierungsengine (v1.5)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )

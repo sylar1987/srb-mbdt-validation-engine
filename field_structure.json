@@ -1,125 +1,142 @@
 {
   "B99.00": [
     {
-      "code": "c0010",
-      "col_number": "0010",
+      "field_code": "c0010",
+      "column": "0010",
       "label": "Name of Legal Entity",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Free text",
+      "mandatory": true
     },
     {
-      "code": "c0020",
-      "col_number": "0020",
+      "field_code": "c0020",
+      "column": "0020",
       "label": "LEI of Legal Entity",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "LEI (20 chars)",
+      "mandatory": true
     },
     {
-      "code": "c0030",
-      "col_number": "0030",
+      "field_code": "c0030",
+      "column": "0030",
       "label": "Country of incorporation",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "ISO 3166-1 alpha-2",
+      "mandatory": true
     },
     {
-      "code": "c0040",
-      "col_number": "0040",
+      "field_code": "c0040",
+      "column": "0040",
       "label": "Name of the ultimate parent entity",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Free text",
+      "mandatory": false
     },
     {
-      "code": "c0041",
-      "col_number": "0041",
+      "field_code": "c0041",
+      "column": "0041",
       "label": "LEI of the ultimate parent entity",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "LEI (20 chars)",
+      "mandatory": false
     },
     {
-      "code": "c0050",
-      "col_number": "0050",
+      "field_code": "c0050",
+      "column": "0050",
       "label": "Name of the Resolution Entity",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Free text",
+      "mandatory": true
     },
     {
-      "code": "c0051",
-      "col_number": "0051",
+      "field_code": "c0051",
+      "column": "0051",
       "label": "LEI of the Resolution Entity",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "LEI (20 chars)",
+      "mandatory": true
     },
     {
-      "code": "c0060",
-      "col_number": "0060",
+      "field_code": "c0060",
+      "column": "0060",
       "label": "Reporting entity type",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Drop-down",
+      "mandatory": true
     },
     {
-      "code": "c0070",
-      "col_number": "0070",
+      "field_code": "c0070",
+      "column": "0070",
       "label": "Reference date",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "Date",
+      "constraint": "yyyy-mm-dd",
+      "mandatory": true
     },
     {
-      "code": "c0080",
-      "col_number": "0080",
+      "field_code": "c0080",
+      "column": "0080",
       "label": "Reported currency",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "ISO 4217",
+      "mandatory": true
     },
     {
-      "code": "c0090",
-      "col_number": "0090",
+      "field_code": "c0090",
+      "column": "0090",
       "label": "EUR exchange rate",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "Numeric",
+      "constraint": "4 decimals",
+      "mandatory": true
     }
   ],
   "B01.00": [
     {
-      "code": "c0010",
-      "col_number": "0010",
+      "field_code": "c0010",
+      "column": "0010",
       "label": "Row number",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "Numeric",
+      "constraint": "Integer",
+      "mandatory": true
     },
     {
-      "code": "c0020",
-      "col_number": "0020",
+      "field_code": "c0020",
+      "column": "0020",
       "label": "Insolvency ranking",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Free text",
+      "mandatory": true
     },
     {
-      "code": "c0030",
-      "col_number": "0030",
+      "field_code": "c0030",
+      "column": "0030",
       "label": "Category",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Drop-down",
+      "mandatory": true
     },
     {
-      "code": "c0040",
-      "col_number": "0040",
+      "field_code": "c0040",
+      "column": "0040",
       "label": "Counterparty type",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Drop-down",
+      "mandatory": true
     },
     {
-      "code": "c0050",
-      "col_number": "0050",
+      "field_code": "c0050",
+      "column": "0050",
       "label": "Relevant amount for Bail-in/WDC",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "Numeric",
+      "constraint": "2 decimals",
+      "mandatory": true
     },
     {
-      "code": "c0060",
-      "col_number": "0060",
+      "field_code": "c0060",
+      "column": "0060",
       "label": "Amount excluded from Bail-in/WDC",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "Numeric",
+      "constraint": "2 decimals",
+      "mandatory": true
     }
   ],
   "B02.00": [
@@ -988,146 +1005,174 @@
   ],
   "B05.00": [
     {
-      "code": "c0010",
-      "col_number": "0010",
+      "field_code": "c0010",
+      "column": "0010",
       "label": "Row number",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "Numeric",
+      "constraint": "Integer",
+      "mandatory": true
     },
     {
-      "code": "c0020",
-      "col_number": "0020",
+      "field_code": "c0020",
+      "column": "0020",
       "label": "Unique (internal) identifier of the guarantee provided to the Non-Resolution Entity",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Free text",
+      "mandatory": true
     },
     {
-      "code": "c0030",
-      "col_number": "0030",
+      "field_code": "c0030",
+      "column": "0030",
       "label": "Governing law",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "ISO 3166-1 alpha 2 / ISO 3166-2",
+      "mandatory": true
     },
     {
-      "code": "c0040",
-      "col_number": "0040",
+      "field_code": "c0040",
+      "column": "0040",
       "label": "Guarantee fulfils the requirements pursuant to Art. 12g (3) SRMR",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "TRUE / FALSE boolean",
+      "mandatory": true
     },
     {
-      "code": "c0050",
-      "col_number": "0050",
+      "field_code": "c0050",
+      "column": "0050",
       "label": "Type of guarantee",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Drop down",
+      "mandatory": true
     },
     {
-      "code": "c0060",
-      "col_number": "0060",
+      "field_code": "c0060",
+      "column": "0060",
       "label": "Maximum amount of the guarantee",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "Numeric",
+      "constraint": "2 decimals",
+      "mandatory": true
     },
     {
-      "code": "c0070",
-      "col_number": "0070",
+      "field_code": "c0070",
+      "column": "0070",
       "label": "Guarantee is secured",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Drop down",
+      "mandatory": true
     },
     {
-      "code": "c0080",
-      "col_number": "0080",
+      "field_code": "c0080",
+      "column": "0080",
       "label": "Current value of the collateral",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "Numeric",
+      "constraint": "2 decimals",
+      "mandatory": false
     },
     {
-      "code": "c0090",
-      "col_number": "0090",
+      "field_code": "c0090",
+      "column": "0090",
       "label": "Guarantee trigger",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Fixed values",
+      "mandatory": true
     },
     {
-      "code": "c0100",
-      "col_number": "0100",
+      "field_code": "c0100",
+      "column": "0100",
       "label": "Legal maturity date of the collateral",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "Date",
+      "constraint": "yyyy-mm-dd",
+      "mandatory": false
     },
     {
-      "code": "c0110",
-      "col_number": "0110",
+      "field_code": "c0110",
+      "column": "0110",
       "label": "Identifier of the securities used as a collateral for the guarantee",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Free text",
+      "mandatory": false
     },
     {
-      "code": "c0120",
-      "col_number": "0120",
+      "field_code": "c0120",
+      "column": "0120",
       "label": "Type of collateralization",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Free text",
+      "mandatory": false
     },
     {
-      "code": "c0130",
-      "col_number": "0130",
+      "field_code": "c0130",
+      "column": "0130",
+      "label": "Value of collateral",
+      "data_type": "Numeric",
+      "constraint": "2 decimals",
+      "mandatory": false
+    },
+    {
+      "field_code": "c0140",
+      "column": "0140",
       "label": "Type of protection value",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Drop down",
+      "mandatory": false
     },
     {
-      "code": "c0140",
-      "col_number": "0140",
+      "field_code": "c0150",
+      "column": "0150",
       "label": "Date of the valuation of the security",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "Date",
+      "constraint": "yyyy-mm-dd",
+      "mandatory": false
     },
     {
-      "code": "c0150",
-      "col_number": "0150",
+      "field_code": "c0160",
+      "column": "0160",
       "label": "Protection valuation approach",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Drop down",
+      "mandatory": false
     }
   ],
   "B06.00": [
     {
-      "code": "c0010",
-      "col_number": "0010",
+      "field_code": "c0010",
+      "column": "0010",
       "label": "Row number",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "Numeric",
+      "constraint": "Integer",
+      "mandatory": true
     },
     {
-      "code": "c0020",
-      "col_number": "0020",
+      "field_code": "c0020",
+      "column": "0020",
       "label": "Identifier of the guarantee",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Free text",
+      "mandatory": true
     },
     {
-      "code": "c0030",
-      "col_number": "0030",
+      "field_code": "c0030",
+      "column": "0030",
       "label": "Amount of guarantee provided by the Resolution Entity",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "Numeric",
+      "constraint": "2 decimals",
+      "mandatory": true
     },
     {
-      "code": "c0040",
-      "col_number": "0040",
+      "field_code": "c0040",
+      "column": "0040",
       "label": "Amount of the external liabilities",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "Numeric",
+      "constraint": "2 decimals",
+      "mandatory": true
     },
     {
-      "code": "c0050",
-      "col_number": "0050",
+      "field_code": "c0050",
+      "column": "0050",
       "label": "Identifier of the intragroup liability subscribed by the SPV",
-      "data_type": "",
-      "constraint": ""
+      "data_type": "String",
+      "constraint": "Free text",
+      "mandatory": true
     }
   ],
   "B90.00": [

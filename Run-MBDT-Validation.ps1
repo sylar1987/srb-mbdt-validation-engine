@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    SRB MBDT Validierungsengine v1.4 - Hauptausfuehrungsskript (Windows PowerShell)
+    SRB MBDT Validierungsengine v1.5 - Hauptausfuehrungsskript (Windows PowerShell)
 
 .DESCRIPTION
     Fuehrt die Validierung von SRB Minimum Bail-in Data Templates (MBDT 2.1)
@@ -116,7 +116,7 @@ $null = chcp 65001 2>$null
 function Write-Banner {
     $line = "=" * 70
     Write-Host $line -ForegroundColor Cyan
-    Write-Host "  SRB MBDT Validierungsengine v1.4" -ForegroundColor Cyan
+    Write-Host "  SRB MBDT Validierungsengine v1.5" -ForegroundColor Cyan
     Write-Host "  Single Resolution Board - Minimum Bail-in Data Template 2.1" -ForegroundColor Cyan
     Write-Host "  B01 - B14 | EBA DPM 4.2 | L1/L2/CL/DPM/CROSS-Regeln" -ForegroundColor Cyan
     Write-Host $line -ForegroundColor Cyan
