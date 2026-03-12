@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+.mbdt_venv_path
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+*.log

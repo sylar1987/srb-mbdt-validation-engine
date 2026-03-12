@@ -1,0 +1,1220 @@
+{
+  "B99.00": [
+    {
+      "code": "c0010",
+      "col_number": "0010",
+      "label": "Name of Legal Entity",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0020",
+      "col_number": "0020",
+      "label": "LEI of Legal Entity",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0030",
+      "col_number": "0030",
+      "label": "Country of incorporation",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0040",
+      "col_number": "0040",
+      "label": "Name of the ultimate parent entity",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0041",
+      "col_number": "0041",
+      "label": "LEI of the ultimate parent entity",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0050",
+      "col_number": "0050",
+      "label": "Name of the Resolution Entity",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0051",
+      "col_number": "0051",
+      "label": "LEI of the Resolution Entity",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0060",
+      "col_number": "0060",
+      "label": "Reporting entity type",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0070",
+      "col_number": "0070",
+      "label": "Reference date",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0080",
+      "col_number": "0080",
+      "label": "Reported currency",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0090",
+      "col_number": "0090",
+      "label": "EUR exchange rate",
+      "data_type": "",
+      "constraint": ""
+    }
+  ],
+  "B01.00": [
+    {
+      "code": "c0010",
+      "col_number": "0010",
+      "label": "Row number",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0020",
+      "col_number": "0020",
+      "label": "Insolvency ranking",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0030",
+      "col_number": "0030",
+      "label": "Category",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0040",
+      "col_number": "0040",
+      "label": "Counterparty type",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0050",
+      "col_number": "0050",
+      "label": "Relevant amount for Bail-in/WDC",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0060",
+      "col_number": "0060",
+      "label": "Amount excluded from Bail-in/WDC",
+      "data_type": "",
+      "constraint": ""
+    }
+  ],
+  "B02.00": [
+    {
+      "code": "c0010",
+      "col_number": "0010",
+      "label": "Row number",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0020",
+      "col_number": "0020",
+      "label": "Unique internal identification number",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0030",
+      "col_number": "0030",
+      "label": "Unique identification number (known to the counterparty)",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0040",
+      "col_number": "0040",
+      "label": "Type of the unique identifier (known to the counterparty)",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0050",
+      "col_number": "0050",
+      "label": "Original amount issued in EUR",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0060",
+      "col_number": "0060",
+      "label": "Original amount issued in foreign currency",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0070",
+      "col_number": "0070",
+      "label": "Contract currency",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0080",
+      "col_number": "0080",
+      "label": "Outstanding principal amount",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0090",
+      "col_number": "0090",
+      "label": "Portion of instrument or liability held by the reporting entity",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0100",
+      "col_number": "0100",
+      "label": "Accrued interest",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0110",
+      "col_number": "0110",
+      "label": "Applicable fees and charges",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0120",
+      "col_number": "0120",
+      "label": "Outstanding amount",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0130",
+      "col_number": "0130",
+      "label": "Relevant amount for Bail-in/WDC",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0140",
+      "col_number": "0140",
+      "label": "Nature of the liability",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0141",
+      "col_number": "0141",
+      "label": "Nature of the liability (if other)",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0150",
+      "col_number": "0150",
+      "label": "Structurally subordinated",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0160",
+      "col_number": "0160",
+      "label": "Insolvency ranking",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0161",
+      "col_number": "0161",
+      "label": "Contractual subordination",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0162",
+      "col_number": "0162",
+      "label": "Bail-in cascade",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0170",
+      "col_number": "0170",
+      "label": "Date of issuance",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0180",
+      "col_number": "0180",
+      "label": "Date of the next interest payment",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0190",
+      "col_number": "0190",
+      "label": "Date of the next (partial) redemption payment",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0200",
+      "col_number": "0200",
+      "label": "Earliest redemption date",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0210",
+      "col_number": "0210",
+      "label": "Legal maturity",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0220",
+      "col_number": "0220",
+      "label": "Governing law",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0230",
+      "col_number": "0230",
+      "label": "Bail-in recognition clause",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0240",
+      "col_number": "0240",
+      "label": "Zero-Coupon",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0250",
+      "col_number": "0250",
+      "label": "Structured product",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0260",
+      "col_number": "0260",
+      "label": "Guaranteed minimum repayment amount of the structured product",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0270",
+      "col_number": "0270",
+      "label": "Fair value of the structured product",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0280",
+      "col_number": "0280",
+      "label": "Not covered and not preferential deposit",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0290",
+      "col_number": "0290",
+      "label": "Not covered but preferential deposit",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0300",
+      "col_number": "0300",
+      "label": "Covered portion of eligible deposits",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0310",
+      "col_number": "0310",
+      "label": "Secured/Unsecured",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0320",
+      "col_number": "0320",
+      "label": "Amount of pledge, lien or collateral",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0330",
+      "col_number": "0330",
+      "label": "Amount of the uncollateralized part",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0340",
+      "col_number": "0340",
+      "label": "Internal identification number of the pledge, lien or collateral/collateral pool",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0350",
+      "col_number": "0350",
+      "label": "Type of the collateral",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0351",
+      "col_number": "0351",
+      "label": "Type of the collateral (if other)",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0360",
+      "col_number": "0360",
+      "label": "Trading method",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0370",
+      "col_number": "0370",
+      "label": "Denomination / Nominal value per security in EUR",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0380",
+      "col_number": "0380",
+      "label": "Denomination / Nominal value per security in original currency",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0390",
+      "col_number": "0390",
+      "label": "Number of securities outstanding not held by the reporting entity",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0391",
+      "col_number": "0391",
+      "label": "Number of securities outstanding held by the reporting entity",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0400",
+      "col_number": "0400",
+      "label": "Accrued interest per security",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0410",
+      "col_number": "0410",
+      "label": "Fees and charges per security",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0420",
+      "col_number": "0420",
+      "label": "Fair value per security",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0430",
+      "col_number": "0430",
+      "label": "Principal amount of the global note in EUR",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0431",
+      "col_number": "0431",
+      "label": "Principal amount of the global note in original currency",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0440",
+      "col_number": "0440",
+      "label": "Nature of the global note",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0450",
+      "col_number": "0450",
+      "label": "Current pool factor",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0460",
+      "col_number": "0460",
+      "label": "Central securities depository",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0461",
+      "col_number": "0461",
+      "label": "Central securities depository (LEI)",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0462",
+      "col_number": "0462",
+      "label": "Central securities depository name (if other)",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0470",
+      "col_number": "0470",
+      "label": "(Mandated) paying agent",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0471",
+      "col_number": "0471",
+      "label": "(Mandated) paying agent (LEI)",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0480",
+      "col_number": "0480",
+      "label": "Trading venue",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0481",
+      "col_number": "0481",
+      "label": "Trading venue (LEI)",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0490",
+      "col_number": "0490",
+      "label": "Registrar for information about creditors/holders",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0491",
+      "col_number": "0491",
+      "label": "Registrar for information about creditors/holders (LEI)",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0500",
+      "col_number": "0500",
+      "label": "National Numbering Agency",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0501",
+      "col_number": "0501",
+      "label": "National Numbering Agency (LEI)",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0510",
+      "col_number": "0510",
+      "label": "Common Depository",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0511",
+      "col_number": "0511",
+      "label": "Common Depository (LEI)",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0520",
+      "col_number": "0520",
+      "label": "Common Service Provider",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0521",
+      "col_number": "0521",
+      "label": "Common Service Provider (LEI)",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0530",
+      "col_number": "0530",
+      "label": "Type of own funds at individual level",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0540",
+      "col_number": "0540",
+      "label": "Eligible amount for own funds at individual level",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0550",
+      "col_number": "0550",
+      "label": "Type of own funds at consolidated level",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0560",
+      "col_number": "0560",
+      "label": "Eligible amount for own funds at consolidated level",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0570",
+      "col_number": "0570",
+      "label": "Amount of the security interest provided",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0580",
+      "col_number": "0580",
+      "label": "Security interest provider (Name)",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0581",
+      "col_number": "0581",
+      "label": "Security interest provider (LEI)",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0590",
+      "col_number": "0590",
+      "label": "Type of security interest provided by a third party",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0600",
+      "col_number": "0600",
+      "label": "Collateral for an asset position",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0610",
+      "col_number": "0610",
+      "label": "Carrying amount IFRS",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0620",
+      "col_number": "0620",
+      "label": "Balance sheet item according to IFRS",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0630",
+      "col_number": "0630",
+      "label": "Carrying amount national GAAP",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0640",
+      "col_number": "0640",
+      "label": "Balance sheet item at Resolution entity level according to national GAAP",
+      "data_type": "",
+      "constraint": "Drop-down (DE)",
+      "de_note": "DE Annex: Drop-down mit 9 Werten (vs. Standard: Free text)"
+    },
+    {
+      "code": "c5000",
+      "col_number": "5000",
+      "label": "Instrument/liability is issued to or bought by an existing shareholder that is not part of the same resolution group",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c5010",
+      "col_number": "5010",
+      "label": "Instrument/liability meets the requirements of Art. 21(7a) SRMR",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0259",
+      "col_number": "0259",
+      "label": "Structured product (if other non-standard terms)",
+      "data_type": "String",
+      "constraint": "Free text",
+      "de_only": true
+    },
+    {
+      "code": "c0299",
+      "col_number": "0299",
+      "label": "Deposit excluded from protection",
+      "data_type": "String",
+      "constraint": "TRUE / FALSE boolean",
+      "de_only": true
+    },
+    {
+      "code": "c0427",
+      "col_number": "0427",
+      "label": "Multiplier of a structured security",
+      "data_type": "Numeric",
+      "constraint": "",
+      "de_only": true
+    },
+    {
+      "code": "c0428",
+      "col_number": "0428",
+      "label": "Unique ID of the underlying of a structured security (ISIN)",
+      "data_type": "String",
+      "constraint": "ISIN",
+      "de_only": true
+    },
+    {
+      "code": "c0429",
+      "col_number": "0429",
+      "label": "Collateral value per security",
+      "data_type": "Numeric",
+      "constraint": "",
+      "de_only": true
+    },
+    {
+      "code": "c0449",
+      "col_number": "0449",
+      "label": "Instrument with pool factor",
+      "data_type": "String",
+      "constraint": "TRUE / FALSE boolean",
+      "de_only": true
+    },
+    {
+      "code": "c0569",
+      "col_number": "0569",
+      "label": "Liability with security interest provided by a third party",
+      "data_type": "String",
+      "constraint": "TRUE / FALSE boolean",
+      "de_only": true
+    },
+    {
+      "code": "c0599",
+      "col_number": "0599",
+      "label": "Type of security interest provided by a third party (if other)",
+      "data_type": "String",
+      "constraint": "Free text",
+      "de_only": true
+    }
+  ],
+  "B03.00": [
+    {
+      "code": "c0010",
+      "col_number": "0010",
+      "label": "Row number",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0020",
+      "col_number": "0020",
+      "label": "Unique identification number of the netting set known to the counterparty",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0030",
+      "col_number": "0030",
+      "label": "Insolvency ranking",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0031",
+      "col_number": "0031",
+      "label": "Bail-in cascade",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0040",
+      "col_number": "0040",
+      "label": "ISDA Protocol Resolution Stay of the reporting entity",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0050",
+      "col_number": "0050",
+      "label": "Recognition Resolution Stay of counterparty",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0060",
+      "col_number": "0060",
+      "label": "Master agreement ID",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0070",
+      "col_number": "0070",
+      "label": "Governing law of the Master Agreement",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0080",
+      "col_number": "0080",
+      "label": "Net mark-to-market value",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0090",
+      "col_number": "0090",
+      "label": "Net value of collateral posted",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0100",
+      "col_number": "0100",
+      "label": "Estimated close-out amount",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0110",
+      "col_number": "0110",
+      "label": "Estimated early termination amount",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0120",
+      "col_number": "0120",
+      "label": "CCP cleared",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0068",
+      "col_number": "0068",
+      "label": "Type of master agreement",
+      "data_type": "String",
+      "constraint": "Drop-down (DE)",
+      "de_only": true
+    },
+    {
+      "code": "c0069",
+      "col_number": "0069",
+      "label": "Type of master agreement (if other)",
+      "data_type": "String",
+      "constraint": "Free text",
+      "de_only": true
+    },
+    {
+      "code": "c0079",
+      "col_number": "0079",
+      "label": "Number of transactions covered within the netting set",
+      "data_type": "Numeric",
+      "constraint": "Integer",
+      "de_only": true
+    }
+  ],
+  "B04.00": [
+    {
+      "code": "c0010",
+      "col_number": "0010",
+      "label": "Row number",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0020",
+      "col_number": "0020",
+      "label": "Unique identification number of the netting set known to the counterparty",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0030",
+      "col_number": "0030",
+      "label": "Insolvency ranking",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0031",
+      "col_number": "0031",
+      "label": "Bail-in cascade",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0040",
+      "col_number": "0040",
+      "label": "Master agreement ID",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0050",
+      "col_number": "0050",
+      "label": "Governing law of the Master Agreement",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0060",
+      "col_number": "0060",
+      "label": "Net mark-to-market value",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0070",
+      "col_number": "0070",
+      "label": "Estimated close-out amount",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0080",
+      "col_number": "0080",
+      "label": "Estimated early termination amount",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0047",
+      "col_number": "0047",
+      "label": "Type of master agreement",
+      "data_type": "String",
+      "constraint": "Drop-down (DE)",
+      "de_only": true
+    },
+    {
+      "code": "c0048",
+      "col_number": "0048",
+      "label": "Type of master agreement (if other)",
+      "data_type": "String",
+      "constraint": "Free text",
+      "de_only": true
+    },
+    {
+      "code": "c0049",
+      "col_number": "0049",
+      "label": "Version of the master agreement",
+      "data_type": "String",
+      "constraint": "Free text",
+      "de_only": true
+    },
+    {
+      "code": "c0057",
+      "col_number": "0057",
+      "label": "ISDA Protocol Resolution Stay of the reporting entity",
+      "data_type": "String",
+      "constraint": "Drop-down (DE)",
+      "de_only": true
+    },
+    {
+      "code": "c0058",
+      "col_number": "0058",
+      "label": "Recognition Resolution Stay of the counterparty",
+      "data_type": "String",
+      "constraint": "Drop-down (DE)",
+      "de_only": true
+    },
+    {
+      "code": "c0059",
+      "col_number": "0059",
+      "label": "Number of transactions covered within the netting set",
+      "data_type": "Numeric",
+      "constraint": "Integer",
+      "de_only": true
+    }
+  ],
+  "B05.00": [
+    {
+      "code": "c0010",
+      "col_number": "0010",
+      "label": "Row number",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0020",
+      "col_number": "0020",
+      "label": "Unique (internal) identifier of the guarantee provided to the Non-Resolution Entity",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0030",
+      "col_number": "0030",
+      "label": "Governing law",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0040",
+      "col_number": "0040",
+      "label": "Guarantee fulfils the requirements pursuant to Art. 12g (3) SRMR",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0050",
+      "col_number": "0050",
+      "label": "Type of guarantee",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0060",
+      "col_number": "0060",
+      "label": "Maximum amount of the guarantee",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0070",
+      "col_number": "0070",
+      "label": "Guarantee is secured",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0080",
+      "col_number": "0080",
+      "label": "Current value of the collateral",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0090",
+      "col_number": "0090",
+      "label": "Guarantee trigger",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0100",
+      "col_number": "0100",
+      "label": "Legal maturity date of the collateral",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0110",
+      "col_number": "0110",
+      "label": "Identifier of the securities used as a collateral for the guarantee",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0120",
+      "col_number": "0120",
+      "label": "Type of collateralization",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0130",
+      "col_number": "0130",
+      "label": "Type of protection value",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0140",
+      "col_number": "0140",
+      "label": "Date of the valuation of the security",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0150",
+      "col_number": "0150",
+      "label": "Protection valuation approach",
+      "data_type": "",
+      "constraint": ""
+    }
+  ],
+  "B06.00": [
+    {
+      "code": "c0010",
+      "col_number": "0010",
+      "label": "Row number",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0020",
+      "col_number": "0020",
+      "label": "Identifier of the guarantee",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0030",
+      "col_number": "0030",
+      "label": "Amount of guarantee provided by the Resolution Entity",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0040",
+      "col_number": "0040",
+      "label": "Amount of the external liabilities",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0050",
+      "col_number": "0050",
+      "label": "Identifier of the intragroup liability subscribed by the SPV",
+      "data_type": "",
+      "constraint": ""
+    }
+  ],
+  "B90.00": [
+    {
+      "code": "c0010",
+      "col_number": "0010",
+      "label": "Row number",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0011",
+      "col_number": "0011",
+      "label": "Tab of origin",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0020",
+      "col_number": "0020",
+      "label": "Unique identification number (known to the counterparty)",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0030",
+      "col_number": "0030",
+      "label": "Counterparty within the resolution group",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0040",
+      "col_number": "0040",
+      "label": "Counterparty name",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0050",
+      "col_number": "0050",
+      "label": "Counterparty identifier (preferably LEI)",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0060",
+      "col_number": "0060",
+      "label": "Type of counterparty identifier",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0070",
+      "col_number": "0070",
+      "label": "Internal identifier of the counterparty",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0080",
+      "col_number": "0080",
+      "label": "Counterparty type",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0090",
+      "col_number": "0090",
+      "label": "Country of the counterparty",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0100",
+      "col_number": "0100",
+      "label": "Relevant amount for Bail-in/WDC",
+      "data_type": "",
+      "constraint": ""
+    },
+    {
+      "code": "c0089",
+      "col_number": "0089",
+      "label": "Sector or industry classification of the counterparty",
+      "data_type": "String",
+      "constraint": "Fixed values (NACE)",
+      "de_only": true
+    }
+  ]
+}
