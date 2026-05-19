@@ -8,6 +8,7 @@ from app.models import ValidationIssue, ValidationSummary
 from app.services.reference_date_service import extract_reference_date
 from app.validation.context import ValidationContext
 from app.validation.dispatcher import Dispatcher
+from app.validation.structure_validator import validate_structure
 
 
 class ValidationEngine:
@@ -48,6 +49,9 @@ class ValidationEngine:
             if rd:
                 ctx.reference_date = rd
                 ctx.batch.reference_date = rd
+
+        # Phase 1.5: Strukturprüfung gegen field_structure.json
+        ctx.issues.extend(validate_structure(ctx))
 
         # Legacy-Adapter braucht aktuellen Stand
         if ctx.legacy_validator is not None:

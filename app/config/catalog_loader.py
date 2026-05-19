@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from app.models.field_structure import FieldStructure
 from app.models.rule import RuleDefinition
 from app.settings import CATALOG_PATH, FIELD_STRUCTURE_PATH
 
@@ -59,9 +60,19 @@ def load_catalog(
 
 
 def load_field_structure(path: Path = FIELD_STRUCTURE_PATH) -> Optional[dict]:
-    """Lädt ``field_structure.json`` (optional)."""
+    """Lädt ``field_structure.json`` als Roh-Dict (Legacy-Pfad)."""
     p = Path(path)
     if not p.exists():
         return None
     with open(p, "r", encoding="utf-8") as fh:
         return json.load(fh)
+
+
+def load_field_structure_model(path: Path = FIELD_STRUCTURE_PATH) -> FieldStructure:
+    """Lädt ``field_structure.json`` als typisiertes ``FieldStructure``-Modell.
+
+    Phase-1.5-Pfad: Validatoren konsumieren das typisierte Modell statt
+    Rohstrings aus dem JSON.
+    """
+    raw = load_field_structure(path)
+    return FieldStructure.from_dict(raw)

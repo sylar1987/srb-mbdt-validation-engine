@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 from app.config.catalog_loader import Catalog
-from app.models import InputBatch, RuleDefinition, ValidationIssue
+from app.models import FieldStructure, InputBatch, RuleDefinition, ValidationIssue
 
 
 @dataclass
@@ -16,10 +16,13 @@ class ValidationContext:
     batch: InputBatch
     catalog: Catalog
     field_structure: Optional[dict] = None
+    field_structure_model: Optional[FieldStructure] = None
     de_annex: bool = False
     reference_date: str = ""
+    use_native_validators: bool = True
     issues: List[ValidationIssue] = field(default_factory=list)
     legacy_validator: Any = None  # Verweis auf MBDTValidator (Phase-1-Adapter)
+    run_id: str = ""
 
     @property
     def templates(self) -> Dict:
