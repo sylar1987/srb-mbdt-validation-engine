@@ -1187,7 +1187,13 @@ class MBDTValidator:
 
         # ── v_CROSS_0010: Submission A/B Deduplication ───────────────────────
         elif rule_id == "v_CROSS_0010":
-            df02_a = self.templates.get("B02.00_TypeA") or self.templates.get("B02.00")
+            # FIX BUG-17: `dict.get(...) or dict.get(...)` wirft bei pandas
+            # DataFrames `ValueError: The truth value of a DataFrame is
+            # ambiguous`, sobald der erste get einen DataFrame liefert.
+            # Korrekt: TypeA bevorzugen, sonst auf generisches B02.00 fallen.
+            df02_a = self.templates.get("B02.00_TypeA")
+            if df02_a is None:
+                df02_a = self.templates.get("B02.00")
             df02_b = self.templates.get("B02.00_TypeB")
             if df02_a is None or df02_b is None:
                 return
