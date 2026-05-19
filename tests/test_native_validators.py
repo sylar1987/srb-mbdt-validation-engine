@@ -201,6 +201,71 @@ def test_datatype_validator_native_lei():
     assert "LEI" in issues[0].message
 
 
+def test_datatype_validator_native_lei_valid_not_rejected_as_numeric():
+    """Regressionstest: ein gültiger LEI darf nicht über das Substring
+    ``numeric`` im test_type ``"LEI format check (20 alphanumeric
+    characters)"`` auf den Numeric-Check misrouted werden.
+
+    Die catalog-konforme test_type-Formulierung enthält das Wort
+    ``numeric`` – würde das _select_checker zuerst auf ``numeric``
+    matchen, würde der gültige LEI (20 alphanumerische Zeichen) als
+    ``"Kein Zahlenwert"`` abgelehnt.
+    """
+    valid_lei = "529900XXXX0000000001"  # 20 alphanumerisch, ISO 17442
+    ctx = _ctx_with({"B99.00": pd.DataFrame({"c0020": [valid_lei]})})
+    rule = RuleDefinition(
+        rule_id="T_LEI_VALID",
+        rule_level="DPM",
+        rule_type="FORMAT_CHECK",
+        template="B99.00",
+        field_code="c0020",
+        # exakte Catalog-Formulierung
+        test_type="LEI format check (20 alphanumeric characters)",
+    )
+    issues = datatype_validator.validate(ctx, rule)
+    assert issues == [], (
+        f"Gültiger LEI '{valid_lei}' wurde fälschlich abgelehnt: "
+        f"{[i.message for i in issues]}"
+    )
+
+
+def test_datatype_validator_select_checker_routes_lei_before_numeric():
+    """Direkter Unit-Test der Routing-Reihenfolge im _select_checker.
+
+    Selbst wenn ``numeric`` als Substring im test_type vorkommt, muss
+    der spezifische LEI-Checker gewählt werden, sobald ``lei`` ebenfalls
+    enthalten ist.
+    """
+    from app.validation.datatype_validator import (
+        _lei_check,
+        _select_checker,
+    )
+
+    fn, out_type = _select_checker("LEI format check (20 alphanumeric characters)")
+    assert fn is _lei_check
+    assert out_type == "FORMAT_CHECK"
+
+
+def test_datatype_validator_native_lei_invalid_with_catalog_test_type():
+    """Negativtest mit exakter Catalog-Formulierung: ein zu kurzer
+    Wert muss als LEI-Format-Fehler (nicht als Numeric-Fehler) gemeldet
+    werden."""
+    ctx = _ctx_with({"B99.00": pd.DataFrame({"c0020": ["SHORT123"]})})
+    rule = RuleDefinition(
+        rule_id="T_LEI_SHORT",
+        rule_level="DPM",
+        rule_type="FORMAT_CHECK",
+        template="B99.00",
+        field_code="c0020",
+        test_type="LEI format check (20 alphanumeric characters)",
+    )
+    issues = datatype_validator.validate(ctx, rule)
+    assert len(issues) == 1
+    assert "LEI-Format" in issues[0].message
+    assert "Kein Zahlenwert" not in issues[0].message
+    assert issues[0].rule_type == "FORMAT_CHECK"
+
+
 def test_datatype_validator_native_iso_currency():
     ctx = _ctx_with({"B02.00": pd.DataFrame({"c0070": ["XYZ"]})})
     rule = RuleDefinition(

@@ -67,18 +67,24 @@ def _lei_check(val_str: str) -> Optional[str]:
 
 
 def _select_checker(test_type: str) -> tuple[Optional[Callable[[str], Optional[str]]], str]:
-    """Liefert (check_fn, ausgegebener rule_type) für die Regel."""
+    """Liefert (check_fn, ausgegebener rule_type) für die Regel.
+
+    Spezifische Tokens (lei, iso 3166, iso 4217) werden vor allgemeinen
+    Tokens (numeric, date) geprüft, damit z. B. ``"LEI format check
+    (20 alphanumeric characters)"`` nicht über das Substring ``numeric``
+    auf ``_numeric_check`` misrouted wird.
+    """
     t = test_type.lower()
-    if "numeric" in t:
-        return _numeric_check, "DATATYPE_CHECK"
-    if "date" in t:
-        return _date_check, "DATATYPE_CHECK"
+    if "lei" in t:
+        return _lei_check, "FORMAT_CHECK"
     if "iso 3166" in t or ("country" in t and "iso" in t):
         return _iso_country_check, "FORMAT_CHECK"
     if "iso 4217" in t or "currency" in t:
         return _iso_currency_check, "FORMAT_CHECK"
-    if "lei" in t:
-        return _lei_check, "FORMAT_CHECK"
+    if "numeric" in t:
+        return _numeric_check, "DATATYPE_CHECK"
+    if "date" in t:
+        return _date_check, "DATATYPE_CHECK"
     return None, "DATATYPE_CHECK"
 
 
