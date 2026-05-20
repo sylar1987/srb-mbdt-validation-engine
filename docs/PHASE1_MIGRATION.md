@@ -1,3 +1,8 @@
+> **Hinweis:** Dieser Stand beschreibt Phase 1 (PR #1).
+> Phase-1.5-Erweiterungen (native Validatoren, typisiertes
+> Field-Structure-Modell, Run-Manifest, entkoppelter Issue-Excel-Writer)
+> sind in `docs/PHASE1_5_NOTES.md` dokumentiert.
+
 # Phase 1 – Migration & Mapping
 
 Dieser Stand setzt **Phase 1** des Soll-Aufbaus

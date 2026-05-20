@@ -5,6 +5,7 @@ from app.models.template_data import TemplateData
 from app.models.rule import RuleDefinition
 from app.models.issue import ValidationIssue
 from app.models.summary import ValidationSummary
+from app.models.field_structure import FieldStructure, TemplateStructure, FieldDefinition
 
 __all__ = [
     "InputBatch",
@@ -12,4 +13,7 @@ __all__ = [
     "RuleDefinition",
     "ValidationIssue",
     "ValidationSummary",
+    "FieldStructure",
+    "TemplateStructure",
+    "FieldDefinition",
 ]

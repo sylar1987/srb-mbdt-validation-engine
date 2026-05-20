@@ -15,10 +15,21 @@ from typing import Optional
 # vom Repo-Root (`python run_validation.py`).
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app.config.catalog_loader import load_catalog, load_field_structure
+from app.config.catalog_loader import (
+    load_catalog,
+    load_field_structure,
+    load_field_structure_model,
+)
 from app.io import load_csv_dir, load_single_csv, load_xlsx
 from app.models import InputBatch, ValidationSummary
-from app.reporting import build_summary, write_excel_report
+from app.reporting import (
+    RunManifest,
+    build_manifest,
+    build_summary,
+    write_excel_report,
+    write_issue_excel,
+)
+from app.reporting.manifest import _utc_now_iso, generate_run_id
 from app.settings import EngineSettings
 from app.validation import Dispatcher, ValidationContext, ValidationEngine
 
@@ -28,9 +39,14 @@ class Runner:
         self.settings = settings or EngineSettings()
         self.catalog = load_catalog(self.settings.catalog_path, de_annex=self.settings.de_annex)
         self.field_structure = load_field_structure(self.settings.field_structure_path)
+        self.field_structure_model = load_field_structure_model(
+            self.settings.field_structure_path
+        )
         self.batch: Optional[InputBatch] = None
         self.context: Optional[ValidationContext] = None
         self.summary: Optional[ValidationSummary] = None
+        self.manifest: Optional[RunManifest] = None
+        self._started_at: str = ""
         # Legacy-Validator (für Phase-1-Adapter & Excel-Report)
         from mbdt_validator import MBDTValidator  # local import to keep startup cheap
 
@@ -62,21 +78,44 @@ class Runner:
     def validate(self) -> ValidationSummary:
         if self.batch is None:
             raise RuntimeError("Kein InputBatch geladen – load_xlsx/load_csv_dir/load_single_csv aufrufen.")
+        self._started_at = _utc_now_iso()
+        run_id = generate_run_id(self.batch.source_path or "", self._started_at)
         self.context = ValidationContext(
             batch=self.batch,
             catalog=self.catalog,
             field_structure=self.field_structure,
+            field_structure_model=self.field_structure_model,
             de_annex=self.settings.de_annex,
             reference_date=self.settings.reference_date,
             legacy_validator=self._legacy,
+            run_id=run_id,
+            use_native_validators=bool(
+                self.settings.extra.get("use_native_validators", True)
+            ),
         )
         engine = ValidationEngine(Dispatcher())
         engine.run(self.context)
         self.summary = build_summary(self.context.issues, self.batch.templates.keys())
+        self.manifest = build_manifest(
+            batch=self.batch,
+            catalog_metadata=self.catalog.metadata,
+            catalog_rule_count=len(self.catalog.rules),
+            issues=self.context.issues,
+            started_at=self._started_at,
+            de_annex=self.settings.de_annex,
+            run_id=run_id,
+        )
         return self.summary
+
+    def write_manifest(self, output_path: str) -> str:
+        """Schreibt das Run-Manifest als deterministisches JSON."""
+        if self.manifest is None:
+            raise RuntimeError("validate() muss zuerst laufen.")
+        return str(self.manifest.write(output_path))
 
     # ── Reporting ────────────────────────────────────────────────────────
     def write_report(self, output_path: str) -> str:
+        """Legacy-Vollreport (umfangreiches Excel-Layout)."""
         if self.context is None:
             raise RuntimeError("validate() muss zuerst laufen.")
         return write_excel_report(
@@ -85,4 +124,16 @@ class Runner:
             output_path,
             entity_name=self.settings.entity_name,
             reference_date=self.settings.reference_date,
+        )
+
+    def write_issue_report(self, output_path: str) -> str:
+        """Phase-1.5-Standardpfad: schlanker Issue-/Summary-/Manifest-Report
+        ohne Legacy-Validator-Abhängigkeit."""
+        if self.context is None:
+            raise RuntimeError("validate() muss zuerst laufen.")
+        return write_issue_excel(
+            self.context.issues,
+            output_path,
+            summary=self.summary,
+            manifest=self.manifest,
         )

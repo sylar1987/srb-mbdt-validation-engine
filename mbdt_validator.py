@@ -822,29 +822,20 @@ class MBDTValidator:
                 continue
             val_str = str(val).strip()
 
-            if "numeric" in test_type:
-                try:
-                    float(val_str.replace(",", "").replace(" ", ""))
-                except (ValueError, TypeError):
+            # Spezifische Tokens vor generischen prüfen, damit z. B.
+            # "LEI format check (20 alphanumeric characters)" nicht über
+            # das Substring "numeric" auf den Numeric-Check misrouted wird.
+            if "lei" in test_type:
+                if not self.LEI_RE.match(val_str.upper()):
                     self._add_error(
                         rule_id=rule_id, rule_level=rule_level,
-                        rule_type="DATATYPE_CHECK", template=tpl_key,
-                        row=idx+2, field_code=field_code, field_label=field_label,
-                        severity=severity, value=val_str,
-                        message=f"Kein Zahlenwert: '{val_str}' in '{field_code}' Zeile {idx+2}.",
-                        explanation=explanation, dpm_reference=dpm_ref
-                    )
-
-            elif "date" in test_type:
-                if not self.DATE_RE.match(val_str):
-                    self._add_error(
-                        rule_id=rule_id, rule_level=rule_level,
-                        rule_type="DATATYPE_CHECK", template=tpl_key,
+                        rule_type="FORMAT_CHECK", template=tpl_key,
                         row=idx+2, field_code=field_code, field_label=field_label,
                         severity=severity, value=val_str,
                         message=(
-                            f"Ungültiges Datum: '{val_str}' in '{field_code}' "
-                            f"Zeile {idx+2}. Erwartet: yyyy-mm-dd."
+                            f"Ungültiges LEI-Format: '{val_str}' in "
+                            f"'{field_code}' Zeile {idx+2}. "
+                            "Erwartet: 20 alphanumerische Zeichen (ISO 17442)."
                         ),
                         explanation=explanation, dpm_reference=dpm_ref
                     )
@@ -881,17 +872,29 @@ class MBDTValidator:
                         explanation=explanation, dpm_reference=dpm_ref
                     )
 
-            elif "lei" in test_type:
-                if not self.LEI_RE.match(val_str.upper()):
+            elif "numeric" in test_type:
+                try:
+                    float(val_str.replace(",", "").replace(" ", ""))
+                except (ValueError, TypeError):
                     self._add_error(
                         rule_id=rule_id, rule_level=rule_level,
-                        rule_type="FORMAT_CHECK", template=tpl_key,
+                        rule_type="DATATYPE_CHECK", template=tpl_key,
+                        row=idx+2, field_code=field_code, field_label=field_label,
+                        severity=severity, value=val_str,
+                        message=f"Kein Zahlenwert: '{val_str}' in '{field_code}' Zeile {idx+2}.",
+                        explanation=explanation, dpm_reference=dpm_ref
+                    )
+
+            elif "date" in test_type:
+                if not self.DATE_RE.match(val_str):
+                    self._add_error(
+                        rule_id=rule_id, rule_level=rule_level,
+                        rule_type="DATATYPE_CHECK", template=tpl_key,
                         row=idx+2, field_code=field_code, field_label=field_label,
                         severity=severity, value=val_str,
                         message=(
-                            f"Ungültiges LEI-Format: '{val_str}' in "
-                            f"'{field_code}' Zeile {idx+2}. "
-                            "Erwartet: 20 alphanumerische Zeichen (ISO 17442)."
+                            f"Ungültiges Datum: '{val_str}' in '{field_code}' "
+                            f"Zeile {idx+2}. Erwartet: yyyy-mm-dd."
                         ),
                         explanation=explanation, dpm_reference=dpm_ref
                     )
