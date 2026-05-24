@@ -2,6 +2,10 @@
 > Phase-1.5-Erweiterungen (native Validatoren, typisiertes
 > Field-Structure-Modell, Run-Manifest, entkoppelter Issue-Excel-Writer)
 > sind in `docs/PHASE1_5_NOTES.md` dokumentiert.
+> Phase-2-Erweiterungen (DSL/AST, `RuleDefinitionV2`,
+> `app/rules_language/`, DSL-Migration des Prerequisite-Evaluators,
+> `expression_validator`) sind in `docs/PHASE2_NOTES.md` dokumentiert;
+> die Sprachdefinition liegt in `docs/PHASE2_DSL_SPEC.md`.
 
 # Phase 1 – Migration & Mapping
 

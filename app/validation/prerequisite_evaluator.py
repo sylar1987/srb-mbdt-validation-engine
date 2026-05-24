@@ -1,30 +1,92 @@
-"""Phase-1-Prerequisite-Evaluator – Einstiegspunkt für die spätere AST-Engine.
+"""Prerequisite-Evaluator – Phase 2: DSL/AST mit Phase-1-Fallback.
 
-Aktuell deckt dieses Modul exakt die Muster ab, die ``MBDTValidator
-._check_prerequisite`` heute kennt: einfache Gleichheit, Stichwörter
-``structured``/``non-structured``. Komplexere Ausdrücke (verschachteltes
-``AND``/``OR``, Vergleichsoperatoren, Cross-Template-Referenzen) sind
-explizit Nicht-Ziel für Phase 1 – Phase 2 ersetzt diesen Evaluator durch
-einen vollständigen DSL/AST-Parser.
+Die Funktion ``evaluate`` versucht zunächst, den ``prerequisite``-Text in
+einen DSL-Ausdruck zu übersetzen (``RuleDefinitionV2.translate_legacy_prerequisite``)
+und über die DSL-Engine auszuwerten. Gelingt das nicht, fällt sie auf die
+ursprüngliche Phase-1-Heuristik zurück.
+
+Ziele:
+  - Keine Regression: für die Mustermenge aus ``rule_catalog.json``
+    liefert die DSL dieselben Ergebnisse wie die Heuristik.
+  - Transparenz: nicht abbildbare Prerequisites werden über das Logging
+    bzw. den Diagnose-Mechanismus sichtbar gemacht; sie laufen über den
+    Fallback, nicht stillschweigend als ``True``.
+  - Auditierbarkeit: das letzte Diagnosis-Objekt pro Aufruf ist über
+    ``last_diagnostics()`` abrufbar.
 """
 
 from __future__ import annotations
 
+import logging
 import re
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
+from app.models.rule_v2 import translate_legacy_prerequisite
 from app.normalization.headers import find_column
+from app.rules_language import EvaluationContext
+from app.rules_language import evaluate as dsl_eval
+from app.rules_language.diagnostics import DSLError, Diagnostic, DiagnosticCode
+
+
+logger = logging.getLogger(__name__)
+
+_LAST_DIAGNOSTICS: List[Diagnostic] = []
+
+
+def last_diagnostics() -> List[Diagnostic]:
+    """Diagnosen des letzten ``evaluate``-Aufrufs (Read-only)."""
+    return list(_LAST_DIAGNOSTICS)
 
 
 def evaluate(
-    df: pd.DataFrame, row_idx: int, prerequisite: str, rule: Dict[str, Any]
+    df: pd.DataFrame,
+    row_idx: int,
+    prerequisite: str,
+    rule: Dict[str, Any],
+    *,
+    templates: Optional[Dict[str, pd.DataFrame]] = None,
+    current_template: str = "",
 ) -> bool:
     """Gibt ``True`` zurück, wenn die Regel auf dieser Zeile angewendet werden soll."""
+    global _LAST_DIAGNOSTICS
+    _LAST_DIAGNOSTICS = []
+
     if not prerequisite:
         return True
 
+    dsl_expr = translate_legacy_prerequisite(prerequisite)
+    if dsl_expr is not None and dsl_expr != "":
+        try:
+            ctx = EvaluationContext(
+                df=df,
+                row_index=row_idx,
+                templates=templates or {},
+                current_template=current_template,
+            )
+            result = dsl_eval(dsl_expr, ctx)
+            _LAST_DIAGNOSTICS = list(ctx.diagnostics)
+            return bool(result)
+        except DSLError as exc:
+            _LAST_DIAGNOSTICS = [exc.diagnostic]
+            # Unbekannte Felder/Templates dürfen nicht still verschluckt
+            # werden, sonst maskieren wir echte Datenprobleme. Wir loggen
+            # und fallen anschließend auf die Heuristik zurück, damit das
+            # Verhalten gegenüber Phase 1 stabil bleibt.
+            logger.debug(
+                "DSL-Prerequisite-Auswertung fehlgeschlagen, fallback: %s "
+                "(rule_id=%s, prerequisite=%r)",
+                exc.diagnostic,
+                rule.get("rule_id", "<?>"),
+                prerequisite,
+            )
+
+    return _legacy_evaluate(df, row_idx, prerequisite)
+
+
+def _legacy_evaluate(df: pd.DataFrame, row_idx: int, prerequisite: str) -> bool:
+    """Phase-1-Heuristik. Bleibt als sicherer Fallback erhalten."""
     prereq_lower = prerequisite.lower()
 
     field_match = re.search(
@@ -50,15 +112,29 @@ def evaluate(
             v = str(df[col].iloc[row_idx]).lower()
             return "structured" in v and "non-structured" not in v
 
+    # Wenn weder DSL noch Heuristik die Bedingung erkennen, dokumentieren wir
+    # das in den Diagnosen, antworten aber konservativ mit True (Phase-1-
+    # Verhalten beibehalten, um keine Issues zu unterdrücken).
+    _LAST_DIAGNOSTICS.append(
+        Diagnostic(
+            DiagnosticCode.UNSUPPORTED_FN,
+            f"Prerequisite weder DSL- noch heuristik-erkennbar: {prerequisite!r}",
+        )
+    )
     return True
 
 
-# Bewusste Nicht-Ziele in Phase 1 (für Phase 2):
 UNSUPPORTED_PATTERNS_DOC = """
-Nicht abgedeckt in Phase 1 (Phase 2 / AST-Engine):
-  - Verschachtelte Boolesche Ausdrücke (AND/OR/NOT mit Klammern)
-  - Vergleichsoperatoren !=, >, <, >=, <=
-  - Cross-Template-Referenzen (template.X.cYYYY)
-  - Mengenoperatoren (in / not in)
-  - Funktionsaufrufe is_null, is_not_null, is_reported
+Phase 2 / DSL deckt jetzt ab:
+  - Gleichheit / Ungleichheit auf c-Feldern (= , == , != , <> , < , <= , > , >=)
+  - Mengen-Mitgliedschaft (in / not in) und (\"A\" OR \"B\")-Syntaxen
+  - Boolesche Verknüpfung mit and/or/not inkl. Klammern
+  - Funktionen: is_null, is_not_null, is_reported, abs, min, max, len, lower, upper
+  - Cross-Template-Referenzen (Bxx.xx.cNNNN)
+
+Bleibt bewusst Phase-1-Fallback / nicht abgedeckt:
+  - Frei-formulierte natürliche Sprache ohne strukturelles Muster
+  - Aggregationen über Zeilen (SUM, COUNT)
+  - Regex/Like
+  - Datumsarithmetik
 """
