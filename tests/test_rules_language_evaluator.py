@@ -72,10 +72,27 @@ def test_evaluate_is_null(df_simple):
 
 
 def test_evaluate_null_in_comparison(df_simple):
-    """null = "x" liefert False (SQL-nahe Semantik)."""
+    """Konsistente Null-Semantik (siehe docs/PHASE2_DSL_SPEC.md).
+
+    ``null = "x"`` → False (null ist nicht "x").
+    ``null != "x"`` → True (null ist ungleich "x"; Existenzprüfung).
+    ``null = null`` → True, ``null != null`` → False.
+    """
     ctx = EvaluationContext(df=df_simple, row_index=2)
     assert evaluate('c0250 = "anything"', ctx) is False
-    assert evaluate('c0250 != "anything"', ctx) is False
+    assert evaluate('c0250 != "anything"', ctx) is True
+    # Symmetrisch
+    assert evaluate('"anything" = c0250', ctx) is False
+    assert evaluate('"anything" != c0250', ctx) is True
+    # null-Literale
+    assert evaluate('null = null', ctx) is True
+    assert evaluate('null != null', ctx) is False
+    assert evaluate('c0250 = null', ctx) is True
+    assert evaluate('c0250 != null', ctx) is False
+    # Numerische Vergleiche bleiben SQL-nah: null < x → False
+    ctx_null = EvaluationContext(df=df_simple, row_index=3)  # c0070 ist NaN
+    assert evaluate('c0070 < 5', ctx_null) is False
+    assert evaluate('c0070 > 5', ctx_null) is False
 
 
 def test_evaluate_unknown_field_raises(df_simple):

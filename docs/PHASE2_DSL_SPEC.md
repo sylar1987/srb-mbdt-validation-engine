@@ -122,19 +122,34 @@ welchem Kontext die Referenzen aufgelöst werden.
 
 ## Wahrheitstabelle für `null`
 
+`=` und `!=` werden in Anwesenheit von `null` als Existenzprüfung interpretiert.
+Damit verhalten sich die Operatoren symmetrisch und decken die in
+SRB-Regeltexten gebräuchlichen Formulierungen ab (`cNNNN != null` ≡
+„cNNNN ist berichtet“).
+
 | Ausdruck           | Ergebnis      |
 |--------------------|---------------|
-| `null = null`      | `false` (!)   |
+| `null = null`      | `true`        |
+| `null != null`     | `false`       |
 | `is_null(null)`    | `true`        |
 | `null = "x"`       | `false`       |
+| `"x" = null`       | `false`       |
 | `"x" != null`      | `true`        |
+| `null != "x"`      | `true`        |
 | `null and true`    | `false`       |
 | `null or true`     | `true`        |
 | `not null`         | `true`        |
 
+Vergleichsoperatoren `<`, `<=`, `>`, `>=` bleiben hingegen SQL-nah: ist
+einer der Operanden `null`, ergibt der Vergleich `false`. Für explizite
+Existenzprüfungen sollten weiterhin `is_null` / `is_not_null` verwendet
+werden – sie sind die kanonische Form und unabhängig von Operator-Spezialfällen.
+
 Begründung: SRB-/EBA-Regeln gehen davon aus, dass nicht-berichtete Felder
 zu einer „nicht erfüllten“ Bedingung führen, nicht zu einer Fehlauswertung.
-Für explizite Null-Checks gibt es `is_null` / `is_not_null`.
+Die symmetrische Sonderbehandlung von `null` bei `=` / `!=` verhindert
+gleichzeitig, dass `cNNNN != null` (häufiges Muster in Bedingungen) wegen
+SQL-Three-Valued-Logik unerwartet `false` liefert.
 
 ## Positive Beispiele
 

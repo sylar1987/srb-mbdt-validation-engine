@@ -85,13 +85,39 @@ def evaluate(
     return _legacy_evaluate(df, row_idx, prerequisite)
 
 
+_CROSS_TEMPLATE_REF = re.compile(
+    r"\b[A-Za-z]\d+(?:\.\d+)*\.c\d{1,4}\b", re.IGNORECASE
+)
+_LOCAL_FIELD_EQ = re.compile(
+    r"(?<![A-Za-z0-9_.])c(\d{1,4})\s*=\s*['\"]?([^'\"]+)['\"]?",
+    re.IGNORECASE,
+)
+
+
 def _legacy_evaluate(df: pd.DataFrame, row_idx: int, prerequisite: str) -> bool:
-    """Phase-1-Heuristik. Bleibt als sicherer Fallback erhalten."""
+    """Phase-1-Heuristik. Bleibt als sicherer Fallback erhalten.
+
+    Cross-Template-Referenzen (z. B. ``B02.00.c0040 = "ISIN"``) werden hier
+    NICHT als lokale Feldprüfung interpretiert. Wenn die Heuristik einen
+    Cross-Ref sieht, dokumentiert sie das in den Diagnosen und liefert
+    konservativ ``True`` (Phase-1-Verhalten: keine stille Unterdrückung von
+    Issues), damit der Aufrufer Tools/Tests bemerken kann, dass die DSL hier
+    hätte greifen müssen.
+    """
     prereq_lower = prerequisite.lower()
 
-    field_match = re.search(
-        r"c(\d{4})\s*=\s*['\"]?([^'\"]+)['\"]?", prerequisite, re.IGNORECASE
-    )
+    if _CROSS_TEMPLATE_REF.search(prerequisite):
+        _LAST_DIAGNOSTICS.append(
+            Diagnostic(
+                DiagnosticCode.UNKNOWN_TEMPLATE,
+                "Cross-Template-Referenz im Legacy-Fallback nicht auswertbar: "
+                f"{prerequisite!r}. DSL-Pfad bevorzugt; Heuristik verweigert "
+                "lokale Substring-Auswertung, um falsche Treffer zu vermeiden.",
+            )
+        )
+        return True
+
+    field_match = _LOCAL_FIELD_EQ.search(prerequisite)
     if field_match:
         cond_col_code = f"c{field_match.group(1).zfill(4)}"
         cond_val = field_match.group(2).strip()

@@ -35,9 +35,9 @@ from app.rules_language.lexer import tokenize
 from app.rules_language.tokens import Token, TokenType
 
 
-_FIELD_RE = re.compile(r"^c\d{4}$", re.IGNORECASE)
+_FIELD_RE = re.compile(r"^c\d{1,4}$", re.IGNORECASE)
 _TEMPLATE_RE = re.compile(r"^[A-Za-z]\d+(?:\.\d+)?$")
-_CROSS_RE = re.compile(r"^([A-Za-z]\d+(?:\.\d+)?)\.(c\d{4})$", re.IGNORECASE)
+_CROSS_RE = re.compile(r"^([A-Za-z]\d+(?:\.\d+)?)\.(c\d{1,4})$", re.IGNORECASE)
 
 
 class _Parser:

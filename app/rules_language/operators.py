@@ -54,6 +54,12 @@ def _as_string(value: Any) -> str:
 
 
 def op_eq(a: Any, b: Any) -> bool:
+    # Konsistente Null-Semantik (siehe docs/PHASE2_DSL_SPEC.md):
+    # ``x = null`` und ``null = x`` werden als „ist x null?“ interpretiert.
+    # Damit gilt insbesondere ``null = null`` → True und
+    # ``"x" = null`` → False symmetrisch.
+    if a is None and b is None:
+        return True
     if a is None or b is None:
         return False
     ca, cb = _coerce_for_compare(a, b)
@@ -63,8 +69,12 @@ def op_eq(a: Any, b: Any) -> bool:
 
 
 def op_neq(a: Any, b: Any) -> bool:
-    if a is None or b is None:
+    # Symmetrisches Komplement zu ``op_eq`` inkl. Null-Semantik:
+    # ``"x" != null`` → True, ``null != null`` → False.
+    if a is None and b is None:
         return False
+    if a is None or b is None:
+        return True
     return not op_eq(a, b)
 
 

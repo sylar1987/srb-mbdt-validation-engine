@@ -128,7 +128,8 @@ def translate_legacy_prerequisite(text: str) -> Optional[str]:
 
 
 _ATOM_PATTERN = re.compile(
-    r"^(c\d{4})\s*(=|!=)\s*(.+)$", re.IGNORECASE
+    r"^((?:[A-Za-z]\d+(?:\.\d+)*\.)?c\d{1,4})\s*(=|!=)\s*(.+)$",
+    re.IGNORECASE,
 )
 
 
@@ -137,7 +138,14 @@ def _translate_atom(atom: str) -> Optional[str]:
     if not m:
         return None
 
-    field_code = m.group(1).lower()
+    lhs = m.group(1)
+    # Template-Präfix Großschreibung lassen (z. B. ``B02.00``), Feldteil
+    # auf kleines ``c`` normalisieren.
+    if "." in lhs:
+        head, _, tail = lhs.rpartition(".")
+        field_code = f"{head}.{tail.lower()}"
+    else:
+        field_code = lhs.lower()
     op = m.group(2)
     rhs = m.group(3).strip()
 
@@ -157,21 +165,29 @@ def _translate_atom(atom: str) -> Optional[str]:
     return f"{field_code} {op} {literal}"
 
 
+def _escape_dsl_string(inner: str) -> str:
+    """Escapt einen Roh-Stringinhalt für ein DSL-``"..."``-Literal.
+
+    Reihenfolge ist relevant: erst Backslash, dann Anführungszeichen, sonst
+    werden frisch eingeführte ``\\`` wieder verdoppelt.
+    """
+    return inner.replace("\\", "\\\\").replace('"', '\\"')
+
+
 def _normalize_string_literal(raw: str) -> Optional[str]:
     raw = raw.strip()
     if not raw:
         return None
-    if raw.startswith('"') and raw.endswith('"'):
-        return raw
-    if raw.startswith("'") and raw.endswith("'"):
-        inner = raw[1:-1].replace('"', '\\"')
-        return f'"{inner}"'
+    if len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in ('"', "'"):
+        # Korrekt gequotetes Literal aus der Legacy-Quelle: Inhalt extrahieren
+        # und im DSL-Format (Double-Quote, Backslash-Escape) neu emittieren.
+        inner = raw[1:-1]
+        return f'"{_escape_dsl_string(inner)}"'
     if re.match(r"^-?\d+(?:\.\d+)?$", raw):
         return raw
     if raw.lower() in ("true", "false", "null"):
         return raw.lower()
-    escaped = raw.replace('"', '\\"')
-    return f'"{escaped}"'
+    return f'"{_escape_dsl_string(raw)}"'
 
 
 def map_legacy_rule(rule: RuleDefinition) -> Optional[RuleDefinitionV2]:

@@ -57,7 +57,14 @@ def validate(ctx: ValidationContext, rule: RuleDefinition) -> List[ValidationIss
         for idx, val in enumerate(df[col]):
             if not is_missing(val):
                 continue
-            if prereq and not eval_prereq(df, idx, prereq, rule.raw):
+            if prereq and not eval_prereq(
+                df,
+                idx,
+                prereq,
+                rule.raw,
+                templates=ctx.batch.templates,
+                current_template=tpl_key,
+            ):
                 continue
             issues.append(
                 build_issue(
