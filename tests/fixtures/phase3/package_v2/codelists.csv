@@ -1,0 +1,3 @@
+codelist_id;name;description;values
+CL_CURRENCY;ISO 4217 Currencies;ISO currencies extended;EUR,USD,GBP,CHF,JPY,SEK
+CL_FREQUENCY;Reporting Frequency;Allowed frequencies;Q,M,A

@@ -1,0 +1,46 @@
+{
+  "rules": [
+    {
+      "rule_id": "V_B02_0010",
+      "scope": "row",
+      "target_template": "B02.00",
+      "condition": "",
+      "assertion": "is_not_null(c0010)",
+      "severity": "ERROR",
+      "message": "LEI is mandatory",
+      "dpm_reference": "DP_B02_C0010"
+    },
+    {
+      "rule_id": "V_B02_0020",
+      "scope": "row",
+      "target_template": "B02.00",
+      "condition": "is_not_null(c0030)",
+      "assertion": "c0030 in (\"EUR\", \"USD\", \"GBP\", \"CHF\", \"JPY\", \"SEK\")",
+      "severity": "ERROR",
+      "message": "Currency must be in CL_CURRENCY",
+      "dpm_reference": "DP_B02_C0030",
+      "codelist_id": "CL_CURRENCY"
+    },
+    {
+      "rule_id": "V_B02_0040",
+      "scope": "row",
+      "target_template": "B02.00",
+      "condition": "is_not_null(c0050)",
+      "assertion": "c0050 >= 0",
+      "severity": "ERROR",
+      "message": "RWA must be non-negative",
+      "dpm_reference": "DP_B02_C0050"
+    },
+    {
+      "rule_id": "V_B02_0030_LEGACY",
+      "scope": "row",
+      "target_template": "B02.00",
+      "condition": "",
+      "assertion": "ASSERT_REGULATORY_TABLE_2014_RIGHT_PAGE_4_PARAGRAPH_3",
+      "severity": "WARN",
+      "message": "Complex legacy rule that cannot be translated to DSL",
+      "dpm_reference": "DP_B02_C0040",
+      "translatable": false
+    }
+  ]
+}
