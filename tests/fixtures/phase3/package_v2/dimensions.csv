@@ -1,0 +1,4 @@
+dimension_id;name;description;codelist_id;mandatory
+ENTITY;Reporting Entity;LEI of the reporting institution;;true
+PERIOD;Reporting Period;Reference period;;true
+UNIT;Unit of Measure;Reporting currency unit;CL_CURRENCY;false

@@ -1,0 +1,6 @@
+datapoint_id;name;template_id;field_code;data_type;cardinality;technical_identifier;description;codelist_id;dimensions;unit
+DP_B02_C0010;Reporting Entity LEI;B02.00;c0010;LEI;1..1;eba:b02.c0010;LEI of reporting entity;;ENTITY;
+DP_B02_C0020;Reporting Date;B02.00;c0020;DATE;1..1;eba:b02.c0020;Reference date;;PERIOD;
+DP_B02_C0030;Currency;B02.00;c0030;STRING;1..1;eba:b02.c0030;Reporting currency;CL_CURRENCY;UNIT;
+DP_B02_C0040;Total Assets;B02.00;c0040;MONETARY;1..1;eba:b02.c0040;Total assets value;;ENTITY,PERIOD;EUR
+DP_B02_C0050;Risk-Weighted Assets;B02.00;c0050;MONETARY;0..1;eba:b02.c0050;RWA value;;ENTITY,PERIOD;EUR

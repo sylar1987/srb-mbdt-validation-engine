@@ -1,0 +1,15 @@
+{
+  "package_id": "EBA-DPM-MINI-v1",
+  "framework_version": "4.2.0",
+  "release_date": "2026-01-15",
+  "hotfix": "",
+  "description": "MVP-Fixture, ein Pilot-Template B02.00",
+  "files": {
+    "datapoints": "datapoints.csv",
+    "templates": "templates.csv",
+    "codelists": "codelists.csv",
+    "rules": "validation_rules.json",
+    "dimensions": "dimensions.csv",
+    "glossary": "glossary.json"
+  }
+}
