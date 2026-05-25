@@ -12,6 +12,7 @@ from app.governance.release_registry import (
     ReleaseStatus,
 )
 from app.governance.approval_workflow import (
+    AcceptanceReportLike,
     ApprovalWorkflow,
     ApprovalEvent,
     ApprovalStatus,
@@ -34,11 +35,13 @@ from app.governance.change_control import (
     ChangeControlReport,
     build_change_control_report,
 )
+from app.governance.engine_gate import EngineGate, GateDecision, GateMode
 
 __all__ = [
     "ReleaseRegistry",
     "ReleaseRecord",
     "ReleaseStatus",
+    "AcceptanceReportLike",
     "ApprovalWorkflow",
     "ApprovalEvent",
     "ApprovalStatus",
@@ -54,4 +57,7 @@ __all__ = [
     "OverrideType",
     "ChangeControlReport",
     "build_change_control_report",
+    "EngineGate",
+    "GateDecision",
+    "GateMode",
 ]

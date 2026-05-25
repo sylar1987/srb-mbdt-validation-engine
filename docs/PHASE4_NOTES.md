@@ -69,12 +69,14 @@ Neu sind drei Pakete und eine erweiterte Dokumentation:
 
 ### Tests
 
-- `tests/test_phase4_governance.py` (19 Tests)
-- `tests/test_phase4_operations.py` (10 Tests)
+- `tests/test_phase4_governance.py` (27 Tests)
+- `tests/test_phase4_operations.py` (13 Tests)
 - `tests/test_phase4_quality.py` (13 Tests)
+- `tests/test_phase4_hardening.py` (22 Tests, Folge-Härtung)
+- `tests/test_utils_hashing.py` (15 Tests)
 
-Bestehende 149 Phase-1- bis Phase-3-Tests bleiben unverändert grün.
-Gesamt 191 Tests.
+Bestehende Phase-1- bis Phase-3-Tests bleiben unverändert grün.
+Gesamt 239 Tests.
 
 ## Was der MVP konkret unterstützt
 
@@ -125,6 +127,61 @@ Gesamt 191 Tests.
   Anwendungscode/Tests. Eine Engine-Integration ist ein Folgeschritt
   (siehe „Offene Punkte").
 
+## Folge-Härtung nach Fix-Commit `deeffe9`
+
+Über den Review-Fix hinaus wurden die folgenden Phase-4-Punkte umgesetzt,
+ohne Phase-3-Pfade umzubauen:
+
+- **Zentrale Hashing-Hilfe** (`app/utils/hashing.py`):
+  - `hash_bytes`, `hash_text`, `hash_file`, `hash_directory`,
+    `hash_object`, `hash_iterable` mit stabilem, kanonischem JSON
+    (`sort_keys`, kompakte Separatoren) und chunked File-Read.
+  - Verzeichnis-Hash sortiert nach POSIX-Pfad und mixt Dateinamen mit,
+    sodass Umbenennungen den Hash ändern.
+  - 15 dedizierte Tests.
+- **RunHistory härten** (`app/operations/run_history.py`):
+  - Append-Schreibvorgänge sind durch `threading.RLock` serialisiert und
+    auf POSIX zusätzlich durch `fcntl.flock` zwischen Prozessen geschützt.
+  - `flush + os.fsync` nach jedem Eintrag, damit Crash-Resistenz gegeben
+    ist.
+  - Neuer Status `RunStatus.ABANDONED`.
+  - `find_orphan_runs()` als reine Diagnose, `mark_orphans_failed(...)`
+    schließt offene Runs kontrolliert mit Reason/Actor und schreibt ein
+    `recovery`-Event in die JSONL-Persistenz.
+- **ResubmissionTracker referenziell härten**
+  (`app/operations/resubmission_tracker.py`):
+  - `record_checked(...)` und freistehende `validate_resubmission(...)`
+    prüfen Existenz und Konsistenz gegen `RunHistory` und
+    `SubmissionRegistry` (origin/new run, Submission, offener Origin,
+    optional Submission-Status `resubmitted`).
+  - Bestehende `record(...)` bleibt unverändert verfügbar — kein hartes
+    Brechen freier Aufrufer.
+- **Acceptance-Gate typisieren**
+  (`app/governance/approval_workflow.py`):
+  - Neues `Protocol AcceptanceReportLike` (runtime-checkable) statt
+    `Any` für `acceptance_report`. Kein zyklischer Import zu
+    `app.quality.metadata_acceptance`.
+  - `isinstance`-Check liefert klaren `TypeError` statt stiller Annahme.
+- **EngineGate-Service** (`app/governance/engine_gate.py`):
+  - Bündelt `ReleaseRegistry.resolve` + `ApprovalWorkflow.status` +
+    `MetadataAcceptanceChecker.check` zu einer auditierbaren
+    `GateDecision`.
+  - Modi `enforce` (Default, hart blockierend) und `warn` (Findings
+    werden in `decision.warnings` markiert, niemals stillgeschluckt).
+  - Aufruferseitig integrierbar; **noch nicht** in
+    `ValidationEngine.run` verdrahtet — bewusst.
+- **Monitoring offene/abandoned Runs**
+  (`app/operations/monitoring.py`):
+  - `MonitoringSnapshot` mit `open_runs`, `abandoned_runs`,
+    `blocked_runs`.
+  - `OperationsMonitor.orphan_run_ids()` direkter Draht zur Recovery.
+- **RegressionSuite-Vergleich**
+  (`app/quality/regression_suite.py`):
+  - `RegressionSuite.evaluate(case_id, actual_error_count, actual_status)`
+    vergleicht gegen `expected_status`/`expected_error_count` und setzt
+    `status` automatisch (`passed`/`failed`) inkl. Diagnostik in
+    `notes`. `record_result` bleibt für manuelle Pfade verfügbar.
+
 ## Behobene Review-Findings aus PR #5
 
 - **ReleaseRegistry.resolve**: Framework-spezifische Releases haben jetzt
@@ -154,14 +211,17 @@ Gesamt 191 Tests.
 
 ## Offene Punkte / Risiken
 
-- **Integration in Runner/Services**: Die neuen Hooks sind eigenständig
-  testbar, aber noch nicht in `ValidationEngine.run` /
-  `MetadataMapper.derive_config` eingehängt. Vor der Aktivierung im
-  Default-Pfad braucht es eine fachliche Entscheidung, ob nicht
-  freigegebene Pakete den Run blocken oder nur warnen.
-- **Persistenzmodell** (Entscheidung A im Konzept): heute JSON-Lines
-  ohne Index; SQLite/DuckDB-Variante ist eine bewusste spätere
-  Option.
+- **Verdrahtung in `ValidationEngine.run`**: `EngineGate` existiert und
+  ist isoliert testbar, ist aber bewusst noch nicht im Default-Pfad der
+  Engine eingehängt. Vor der Aktivierung braucht es eine fachliche
+  Entscheidung über Modus (`enforce` vs. `warn`) je Umgebung.
+- **Automatischer Run-Lifecycle**: `RunHistory.start/complete` wird
+  heute nur explizit aus Test/Anwendungscode aufgerufen. Eine Engine-
+  seitige Auto-Protokollierung (Run-ID, Metadata-/Rule-Version,
+  Artefakte) steht aus.
+- **Persistenzmodell** (Entscheidung A im Konzept): JSON-Lines ist nun
+  per Lock + fsync abgesichert, bleibt aber index-frei. SQLite/DuckDB
+  bleibt offene Option für hohe Run-Zahlen.
 - **OIM-Tiefe** (Entscheidung C): MVP liefert Findings, kein echter
   OIM-Validator. Folge-Iteration wählt einen konkreten Pilotreport.
 - **Zweite Domäne** (Entscheidung D): noch nicht angefasst.
@@ -170,19 +230,17 @@ Gesamt 191 Tests.
   Quellsignaturen geprüft werden.
 - **Rule-Review-Workflow**: Reviewer und Approver sind heute freie
   Strings — vor produktivem Einsatz braucht es ein Identitätsmodell.
-- **JSONL-Persistenz**: `RunHistory` schreibt unsynchronisiert in eine
-  JSON-Lines-Datei. Bei parallelen Runs fehlt ein File-Lock; vor
-  produktivem Multi-Process-Betrieb muss entweder ein `fcntl`-basiertes
-  Lock ergänzt oder auf SQLite/DuckDB gewechselt werden.
-- **Zentrale Hash-Hilfe**: Content-/Input-Hashing geschieht heute lokal
-  in mehreren Modulen (ApprovalWorkflow-Key, RunRecord-Input, Metadata-
-  Versioning). Eine gemeinsame Hilfe (`app/utils/hashing.py`) würde
-  Drift vermeiden.
-- **Referential Integrity bei Resubmission**: `ResubmissionTracker`
-  validiert die Eigenständigkeit der `new_run_id` formal, aber nicht
-  gegen das tatsächliche Vorhandensein des Origin-Runs in `RunHistory`
-  bzw. der Submission in `SubmissionRegistry`. Bei produktiver
-  Aktivierung über die Engine sollte ein Cross-Check eingezogen werden.
+- **Hash-Hilfe vollständig adoptieren**: `app/utils/hashing.py` steht
+  bereit; eine spätere, nicht-invasive Migration von
+  `MetadataPackage.content_hash` und ähnlichen lokalen
+  `hashlib.sha256`-Aufrufen auf `hash_object` ist sinnvoll, sobald ein
+  konsistenter Hash-Vertrag dokumentiert ist.
+- **Regressionssuite-Datenbasis**: `RegressionSuite.evaluate` vergleicht
+  jetzt tatsächlich gegen Expectations — echte Submission-Fixtures als
+  Cases fehlen aber weiterhin.
+- **UI / externe Workflow-Engine**: bewusst nicht vorgesehen; Phase 4
+  bleibt headless.
+- **Echte regulatorische Submissions**: weiterhin außerhalb des Scopes.
 
 ## Empfohlene nächste Schritte
 

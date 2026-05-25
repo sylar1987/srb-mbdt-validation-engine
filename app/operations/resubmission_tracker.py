@@ -4,7 +4,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from app.operations.run_history import RunHistory
+    from app.operations.submission_registry import SubmissionRegistry
 
 
 @dataclass
@@ -67,8 +71,91 @@ class ResubmissionTracker:
     def all_resubmissions(self) -> List[ResubmissionRecord]:
         return list(self._records.values())
 
+    def record_checked(
+        self,
+        entry: ResubmissionRecord,
+        run_history: "RunHistory",
+        submission_registry: "SubmissionRegistry",
+        require_submission_resubmitted: bool = False,
+    ) -> ResubmissionRecord:
+        """Schreibe eine Resubmission, prüfe vorher referenzielle Integrität.
+
+        Variante zu ``record`` für den sicheren Pfad. Bricht ab, wenn
+
+        * ``submission_id`` nicht in ``submission_registry`` existiert,
+        * ``origin_run_id`` oder ``new_run_id`` nicht in ``run_history``
+          existieren,
+        * ``submission_id`` der referenzierten Runs nicht zur Resubmission-
+          Submission passt,
+        * der Origin-Run noch nicht abgeschlossen ist (``finished_at``
+          leer), oder
+        * ``require_submission_resubmitted=True`` gesetzt ist und die
+          Submission noch nicht im Status ``resubmitted`` steht.
+
+        Die Bestandsmethode ``record`` bleibt unverändert verfügbar, damit
+        Aufrufer mit losen Strings nicht hart brechen.
+        """
+        validate_resubmission(
+            entry,
+            run_history=run_history,
+            submission_registry=submission_registry,
+            require_submission_resubmitted=require_submission_resubmitted,
+        )
+        return self.record(entry)
+
     def _must_get(self, resubmission_id: str) -> ResubmissionRecord:
         record = self._records.get(resubmission_id)
         if record is None:
             raise KeyError(f"unknown resubmission '{resubmission_id}'")
         return record
+
+
+def validate_resubmission(
+    entry: ResubmissionRecord,
+    run_history: "RunHistory",
+    submission_registry: "SubmissionRegistry",
+    require_submission_resubmitted: bool = False,
+) -> None:
+    """Reine Validierung gegen die Bestandsstores — wirft bei Verstoß.
+
+    Als Service-Funktion verfügbar, damit Aufrufer die Prüfung auch ohne
+    direkten Tracker-Bezug nutzen können (z. B. in einer Engine-Stufe).
+    """
+    if entry.submission_id and submission_registry.get(entry.submission_id) is None:
+        raise ValueError(
+            f"unknown submission '{entry.submission_id}' for resubmission "
+            f"'{entry.resubmission_id}'"
+        )
+    origin = run_history.get(entry.origin_run_id)
+    if origin is None:
+        raise ValueError(
+            f"unknown origin run '{entry.origin_run_id}' for resubmission "
+            f"'{entry.resubmission_id}'"
+        )
+    new_run = run_history.get(entry.new_run_id)
+    if new_run is None:
+        raise ValueError(
+            f"unknown new run '{entry.new_run_id}' for resubmission "
+            f"'{entry.resubmission_id}'"
+        )
+    if entry.submission_id and origin.submission_id and origin.submission_id != entry.submission_id:
+        raise ValueError(
+            f"origin run '{entry.origin_run_id}' belongs to submission "
+            f"'{origin.submission_id}', not '{entry.submission_id}'"
+        )
+    if entry.submission_id and new_run.submission_id and new_run.submission_id != entry.submission_id:
+        raise ValueError(
+            f"new run '{entry.new_run_id}' belongs to submission "
+            f"'{new_run.submission_id}', not '{entry.submission_id}'"
+        )
+    if not origin.finished_at:
+        raise ValueError(
+            f"origin run '{entry.origin_run_id}' is still open; cannot link resubmission"
+        )
+    if require_submission_resubmitted and entry.submission_id:
+        sub = submission_registry.get(entry.submission_id)
+        if sub is not None and sub.status != "resubmitted":
+            raise ValueError(
+                f"submission '{entry.submission_id}' must be in status 'resubmitted', "
+                f"is '{sub.status}'"
+            )

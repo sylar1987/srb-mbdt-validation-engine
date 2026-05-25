@@ -18,6 +18,9 @@ class MonitoringSnapshot:
     artifacts_count: int = 0
     runs_with_zero_errors: int = 0
     success_rate: float = 0.0
+    open_runs: int = 0
+    abandoned_runs: int = 0
+    blocked_runs: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -47,7 +50,14 @@ class OperationsMonitor:
 
         completed = snapshot.runs_by_status.get(RunStatus.COMPLETED, 0)
         snapshot.success_rate = completed / len(runs) if runs else 0.0
+        snapshot.open_runs = snapshot.runs_by_status.get(RunStatus.STARTED, 0)
+        snapshot.abandoned_runs = snapshot.runs_by_status.get(RunStatus.ABANDONED, 0)
+        snapshot.blocked_runs = snapshot.runs_by_status.get(RunStatus.BLOCKED, 0)
         return snapshot
+
+    def orphan_run_ids(self) -> List[str]:
+        """Liefert run_ids offener Runs — direkter Draht zur Recovery."""
+        return [r.run_id for r in self._history.find_orphan_runs()]
 
     def top_error_classes(self, limit: int = 5) -> List[Dict[str, Any]]:
         snapshot = self.snapshot()

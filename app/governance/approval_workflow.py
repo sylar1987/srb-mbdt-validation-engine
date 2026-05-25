@@ -9,7 +9,22 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Protocol, Tuple, runtime_checkable
+
+
+@runtime_checkable
+class AcceptanceReportLike(Protocol):
+    """Vertrag eines Acceptance-Reports für das Approval-Gate.
+
+    Bewusst minimal: ``has_errors()`` entscheidet, ob ein Approve blockiert
+    wird, ``to_dict()`` liefert das auditierbare Snapshot der Findings.
+    Über ``Protocol`` vermeiden wir den zyklischen Import von
+    ``app.quality.metadata_acceptance`` in ``app.governance``.
+    """
+
+    def has_errors(self) -> bool: ...
+
+    def to_dict(self) -> Dict[str, Any]: ...
 
 
 class ApprovalStatus:
@@ -95,7 +110,7 @@ class ApprovalWorkflow:
         actor: str,
         reason: str = "",
         metadata: Optional[Dict[str, Any]] = None,
-        acceptance_report: Optional[Any] = None,
+        acceptance_report: Optional[AcceptanceReportLike] = None,
     ) -> ApprovalEvent:
         if new_status not in ApprovalStatus.ALL:
             raise ValueError(f"unsupported approval status '{new_status}'")
@@ -129,15 +144,19 @@ class ApprovalWorkflow:
         # Verhalten kompatibel — die Verantwortung liegt dann beim Caller
         # (siehe Convenience ``approve_if_accepted``).
         if new_status == ApprovalStatus.APPROVED and acceptance_report is not None:
-            has_errors = getattr(acceptance_report, "has_errors", None)
-            if callable(has_errors) and has_errors():
+            # ``isinstance``-Check gegen das Protocol gibt einen klaren
+            # Fehler statt einer stummen Annahme, wenn der Caller etwas
+            # Strukturfremdes übergibt — z. B. ein Dict.
+            if not isinstance(acceptance_report, AcceptanceReportLike):
+                raise TypeError(
+                    "acceptance_report must implement has_errors() and to_dict()"
+                )
+            if acceptance_report.has_errors():
                 raise ValueError(
                     f"approval blocked for {package_id}@{content_hash}: "
                     f"acceptance report has errors"
                 )
-            to_dict = getattr(acceptance_report, "to_dict", None)
-            if callable(to_dict):
-                merged_metadata.setdefault("acceptance_report", to_dict())
+            merged_metadata.setdefault("acceptance_report", acceptance_report.to_dict())
 
         event = ApprovalEvent(
             package_id=package_id,
@@ -158,7 +177,7 @@ class ApprovalWorkflow:
         content_hash: str,
         actor: str,
         reason: str,
-        acceptance_report: Any,
+        acceptance_report: AcceptanceReportLike,
         metadata: Optional[Dict[str, Any]] = None,
     ) -> ApprovalEvent:
         """Convenience: nur freigeben, wenn der Acceptance-Report ok ist.

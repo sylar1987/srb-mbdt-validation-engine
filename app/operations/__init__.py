@@ -17,6 +17,7 @@ from app.operations.submission_registry import (
 from app.operations.resubmission_tracker import (
     ResubmissionTracker,
     ResubmissionRecord,
+    validate_resubmission,
 )
 from app.operations.monitoring import (
     OperationsMonitor,
@@ -33,6 +34,7 @@ __all__ = [
     "SubmissionStatus",
     "ResubmissionTracker",
     "ResubmissionRecord",
+    "validate_resubmission",
     "OperationsMonitor",
     "MonitoringSnapshot",
     "AuditQuery",
