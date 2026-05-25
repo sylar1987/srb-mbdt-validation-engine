@@ -64,7 +64,19 @@ def op_eq(a: Any, b: Any) -> bool:
         return False
     ca, cb = _coerce_for_compare(a, b)
     if isinstance(ca, str) and isinstance(cb, str):
-        return ca.casefold() == cb.casefold()
+        if ca.casefold() == cb.casefold():
+            return True
+        # DPM-Wertealias: 'CODE - Caption' ist äquivalent zu 'CODE'. Wir
+        # reduzieren beide Seiten heuristisch (ohne Codeliste) und
+        # vergleichen erneut. Numerische Werte, Datumswerte und LEIs
+        # bleiben durch die Schutzregeln in canonicalize_for_compare
+        # unangetastet.
+        from app.normalization.value_resolver import canonicalize_for_compare
+        cac = canonicalize_for_compare(ca)
+        cbc = canonicalize_for_compare(cb)
+        if cac and cbc and cac.casefold() == cbc.casefold():
+            return True
+        return False
     return ca == cb
 
 

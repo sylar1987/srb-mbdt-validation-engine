@@ -14,6 +14,7 @@ from typing import List
 
 from app.models import RuleDefinition, ValidationIssue
 from app.normalization.headers import find_column
+from app.normalization.value_resolver import resolve_value
 from app.services.template_lookup_service import find_matching_keys
 from app.utils.numeric import is_missing
 from app.validation._issue_builder import build_issue
@@ -67,6 +68,10 @@ def validate(ctx: ValidationContext, rule: RuleDefinition) -> List[ValidationIss
                 continue
             val_str = str(val).strip()
             if val_str in valid_set:
+                continue
+            # DPM Alias-Auflösung: 'CODE - Caption', 'CODE: ...', etc.
+            resolution = resolve_value(val_str, codelist_values)
+            if resolution.matched:
                 continue
             top10 = ", ".join(sorted(codelist_values)[:10])
             ellipsis = "..." if len(codelist_values) > 10 else ""

@@ -25,6 +25,7 @@ import pandas as pd
 
 from app.models.rule_v2 import translate_legacy_prerequisite
 from app.normalization.headers import find_column
+from app.normalization.value_resolver import canonicalize_for_compare
 from app.rules_language import EvaluationContext
 from app.rules_language import evaluate as dsl_eval
 from app.rules_language.diagnostics import DSLError, Diagnostic, DiagnosticCode
@@ -124,6 +125,12 @@ def _legacy_evaluate(df: pd.DataFrame, row_idx: int, prerequisite: str) -> bool:
         actual_col = find_column(df, cond_col_code)
         if actual_col and row_idx < len(df):
             actual_val = str(df[actual_col].iloc[row_idx]).strip()
+            # DPM Alias-Auflösung: 'CODE - Caption' ist äquivalent zu 'CODE',
+            # in beide Richtungen (Regelwert <-> Inputwert).
+            cond_canon = canonicalize_for_compare(cond_val).lower()
+            actual_canon = canonicalize_for_compare(actual_val).lower()
+            if cond_canon and actual_canon and cond_canon == actual_canon:
+                return True
             return cond_val.lower() in actual_val.lower()
         return False
 
