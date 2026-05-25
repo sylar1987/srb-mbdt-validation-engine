@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 import openpyxl
 import pandas as pd
 
 from app.io.template_registry import normalize_sheet_name
 from app.models import InputBatch, TemplateData
+from app.normalization.field_resolver import resolve_dataframe_columns
 from app.normalization.headers import extract_headers, find_header_row
 from app.normalization.values import normalize_dataframe_strings
 
@@ -17,6 +18,7 @@ from app.normalization.values import normalize_dataframe_strings
 def load_xlsx(
     filepath: str | Path,
     batch: Optional[InputBatch] = None,
+    field_structure: Any = None,
 ) -> InputBatch:
     """Lädt ein MBDT-XLSX-Workbook (SRB Annex I Format)."""
     batch = batch or InputBatch(source_type="xlsx", source_path=str(filepath))
@@ -50,6 +52,8 @@ def load_xlsx(
         if data_rows:
             df = pd.DataFrame(data_rows, columns=headers)
             df = normalize_dataframe_strings(df)
+            if field_structure is not None:
+                df, _diag = resolve_dataframe_columns(df, normalized, field_structure)
             batch.add(TemplateData(
                 template_id=normalized,
                 key=normalized,

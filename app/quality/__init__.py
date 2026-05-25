@@ -5,6 +5,11 @@ Regression-Suite. Vermeidet bewusst eine harte OIM-Vollvalidierung —
 der MVP liefert klare Findings, keine generische Taxonomieprüfung.
 """
 
+from app.quality.catalog_conformance import (
+    CatalogConformanceReport,
+    CatalogFinding,
+    check_catalog,
+)
 from app.quality.export_conformance import (
     ExportConformanceChecker,
     ConformanceFinding,
@@ -27,6 +32,9 @@ from app.quality.regression_suite import (
 )
 
 __all__ = [
+    "CatalogConformanceReport",
+    "CatalogFinding",
+    "check_catalog",
     "ExportConformanceChecker",
     "ConformanceFinding",
     "ConformanceReport",

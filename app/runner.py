@@ -57,19 +57,21 @@ class Runner:
 
     # ── Input loading ────────────────────────────────────────────────────
     def load_xlsx(self, filepath: str | Path) -> InputBatch:
-        self.batch = load_xlsx(filepath)
+        self.batch = load_xlsx(filepath, field_structure=self.field_structure_model)
         self.batch.entity_name = self.settings.entity_name
         self.batch.reference_date = self.settings.reference_date
         return self.batch
 
     def load_csv_dir(self, directory: str | Path) -> InputBatch:
-        self.batch = load_csv_dir(directory)
+        self.batch = load_csv_dir(directory, field_structure=self.field_structure_model)
         self.batch.entity_name = self.settings.entity_name
         self.batch.reference_date = self.settings.reference_date
         return self.batch
 
     def load_single_csv(self, filepath: str | Path, template_id: str) -> InputBatch:
-        self.batch = load_single_csv(filepath, template_id)
+        self.batch = load_single_csv(
+            filepath, template_id, field_structure=self.field_structure_model
+        )
         self.batch.entity_name = self.settings.entity_name
         self.batch.reference_date = self.settings.reference_date
         return self.batch
