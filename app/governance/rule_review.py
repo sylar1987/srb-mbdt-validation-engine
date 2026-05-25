@@ -34,6 +34,16 @@ class RuleTestStatus:
     ALL = (MISSING, PARTIAL, PASSED, FAILED)
 
 
+_RULE_COMPARABLE_FIELDS = (
+    "scope",
+    "target_template",
+    "condition",
+    "assertion",
+    "severity",
+    "message",
+)
+
+
 @dataclass
 class RuleReview:
     """Reviewstatus einer Regel mit Tests, Reviewer und Begründung."""
@@ -77,7 +87,12 @@ class RuleReviewRegistry:
 
     @staticmethod
     def _fingerprint(rule: RuleDefinitionV2) -> str:
-        return f"{rule.scope}|{rule.target_template}|{rule.condition}|{rule.assertion}|{rule.severity}"
+        # Felder synchron zu `_RULE_COMPARABLE_FIELDS` halten: jedes Feld,
+        # das `diff_rules` als regressionsrelevant einstuft, muss auch den
+        # Review-Fingerprint invalidieren. Andernfalls würde z. B. eine
+        # geänderte ``message`` als reportingrelevante Änderung gelten,
+        # ohne den bestehenden Review zu verwerfen.
+        return "|".join(getattr(rule, name) or "" for name in _RULE_COMPARABLE_FIELDS)
 
     def upsert(self, rule: RuleDefinitionV2, review: RuleReview) -> RuleReview:
         if review.rule_id != rule.rule_id:
@@ -132,16 +147,6 @@ class RuleChange:
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
-
-
-_RULE_COMPARABLE_FIELDS = (
-    "scope",
-    "target_template",
-    "condition",
-    "assertion",
-    "severity",
-    "message",
-)
 
 
 def diff_rules(

@@ -105,15 +105,19 @@ class ReleaseRegistry:
         for existing in self._records.values():
             if existing.kind != candidate.kind:
                 continue
-            if existing.framework_version and candidate.framework_version:
-                if existing.framework_version != candidate.framework_version:
-                    continue
             if not existing.is_active():
+                continue
+            # Generic-Releases (framework_version="") sind Fallback und
+            # dürfen mit framework-spezifischen parallel existieren. Sie
+            # kollidieren nur untereinander oder mit derselben spezifischen
+            # Version, damit die Resolve-Reihenfolge eindeutig bleibt.
+            if existing.framework_version != candidate.framework_version:
                 continue
             if _intervals_overlap(existing, candidate):
                 raise ValueError(
                     f"release '{candidate.release_id}' overlaps with active "
                     f"release '{existing.release_id}' for kind '{candidate.kind}'"
+                    f" framework='{candidate.framework_version or 'generic'}'"
                 )
 
     # -- mutation ---------------------------------------------------------
@@ -147,13 +151,22 @@ class ReleaseRegistry:
     ) -> ReleaseRecord:
         """Wählt deterministisch das passende Release für einen Stichtag.
 
-        Reihenfolge: gültig + approved + spezifischste Framework-Version,
-        bei Gleichstand neueste Registrierung. Fehlt ein Treffer, wird
-        ``LookupError`` geworfen — die Engine muss das aktiv abfangen.
+        Auswahlregel:
+        1. Framework-spezifische Releases (``record.framework_version ==
+           framework_version`` und nicht-leer) haben strikten Vorrang.
+        2. Generische Releases (``record.framework_version == ""``)
+           dienen nur als Fallback, wenn keine framework-spezifische
+           Variante für den Stichtag freigegeben ist.
+        3. Bei Gleichstand zählen späteres ``valid_from`` und zuletzt die
+           jüngere ``registered_at``.
+
+        Fehlt ein Treffer, wird ``LookupError`` geworfen — die Engine muss
+        das aktiv abfangen.
         """
         if kind not in VALID_KINDS:
             raise ValueError(f"unsupported release kind '{kind}'")
-        candidates: List[ReleaseRecord] = []
+        specific: List[ReleaseRecord] = []
+        generic: List[ReleaseRecord] = []
         for record in self._records.values():
             if record.kind != kind:
                 continue
@@ -161,27 +174,44 @@ class ReleaseRegistry:
                 continue
             if require_approved and record.status != ReleaseStatus.APPROVED:
                 continue
-            if framework_version and record.framework_version not in ("", framework_version):
-                continue
             if not record.covers(reporting_date):
                 continue
-            candidates.append(record)
+            if framework_version:
+                if record.framework_version == framework_version:
+                    specific.append(record)
+                elif record.framework_version == "":
+                    generic.append(record)
+                # andere framework_version-Werte sind nicht anwendbar.
+            else:
+                # Kein Framework-Filter: generic-Treffer haben Vorrang vor
+                # framework-spezifischen, damit das Verhalten symmetrisch
+                # bleibt (Aufruf ohne framework_version sucht generic).
+                if record.framework_version == "":
+                    generic.append(record)
+                else:
+                    specific.append(record)
 
-        if not candidates:
+        # Bei explizitem framework_version: specific zuerst, generic Fallback.
+        # Ohne framework_version: generic zuerst, sonst irgendein specific.
+        if framework_version:
+            pool = specific or generic
+        else:
+            pool = generic or specific
+
+        if not pool:
             raise LookupError(
                 f"no {'approved ' if require_approved else ''}release for kind={kind} "
                 f"date={reporting_date} framework={framework_version or 'any'}"
             )
 
-        candidates.sort(
+        pool.sort(
             key=lambda r: (
-                0 if r.framework_version == framework_version else 1,
                 _date_key(r.valid_from),
                 r.registered_at,
             ),
             reverse=True,
         )
-        return candidates[0]
+        return pool[0]
 
     def _must_get(self, release_id: str) -> ReleaseRecord:
         record = self._records.get(release_id)

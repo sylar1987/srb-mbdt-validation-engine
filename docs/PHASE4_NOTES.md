@@ -125,6 +125,33 @@ Gesamt 191 Tests.
   Anwendungscode/Tests. Eine Engine-Integration ist ein Folgeschritt
   (siehe „Offene Punkte").
 
+## Behobene Review-Findings aus PR #5
+
+- **ReleaseRegistry.resolve**: Framework-spezifische Releases haben jetzt
+  strikten Vorrang vor generischen (`framework_version=""`). Generic dient
+  nur als Fallback, wenn keine spezifische Variante für den Stichtag
+  freigegeben ist. Overlap-Check ist konsistent: Generic und spezifische
+  Releases kollidieren nicht, gleichartige Generic/Generic und
+  Specific/Specific desselben Frameworks dagegen schon.
+- **RuleReview-Fingerprint**: `_fingerprint` und `diff_rules` teilen sich
+  jetzt dasselbe Feldset `_RULE_COMPARABLE_FIELDS` inklusive `message`.
+  Eine reine Message-Änderung verwirft den Review.
+- **SubmissionRegistry-State-Machine**: Explizite Übergangsmap mit
+  `REJECTED` als Terminalstatus. `REJECTED → DRAFT → ACCEPTED` ist
+  ausgeschlossen; Korrekturen erfordern eine neue Submission-ID.
+  `RESUBMITTED` bleibt explizite Ausnahme aus `ACCEPTED` heraus.
+- **OverrideRegistry.find_for_target**: Widerrufene Overrides werden
+  standardmäßig ausgeblendet, auch wenn kein `reporting_date` übergeben
+  wird. Über `include_revoked=True` lässt sich der Audit-Blick explizit
+  öffnen.
+- **Approval + Acceptance-Gate**: `transition(..., acceptance_report=...)`
+  blockt eine `APPROVED`-Transition, wenn der Report Errors enthält.
+  Convenience `approve_if_accepted(...)` macht das Gate zu einem
+  expliziten Codeschritt; die `acceptance_report.to_dict()` wandert in
+  die Event-Metadaten und ist damit auditierbar.
+- **Reason-Pflicht für DEPRECATED**: Übergang nach `DEPRECATED` erzwingt
+  jetzt einen Grund analog zu `APPROVED`/`REJECTED`.
+
 ## Offene Punkte / Risiken
 
 - **Integration in Runner/Services**: Die neuen Hooks sind eigenständig
@@ -143,6 +170,19 @@ Gesamt 191 Tests.
   Quellsignaturen geprüft werden.
 - **Rule-Review-Workflow**: Reviewer und Approver sind heute freie
   Strings — vor produktivem Einsatz braucht es ein Identitätsmodell.
+- **JSONL-Persistenz**: `RunHistory` schreibt unsynchronisiert in eine
+  JSON-Lines-Datei. Bei parallelen Runs fehlt ein File-Lock; vor
+  produktivem Multi-Process-Betrieb muss entweder ein `fcntl`-basiertes
+  Lock ergänzt oder auf SQLite/DuckDB gewechselt werden.
+- **Zentrale Hash-Hilfe**: Content-/Input-Hashing geschieht heute lokal
+  in mehreren Modulen (ApprovalWorkflow-Key, RunRecord-Input, Metadata-
+  Versioning). Eine gemeinsame Hilfe (`app/utils/hashing.py`) würde
+  Drift vermeiden.
+- **Referential Integrity bei Resubmission**: `ResubmissionTracker`
+  validiert die Eigenständigkeit der `new_run_id` formal, aber nicht
+  gegen das tatsächliche Vorhandensein des Origin-Runs in `RunHistory`
+  bzw. der Submission in `SubmissionRegistry`. Bei produktiver
+  Aktivierung über die Engine sollte ein Cross-Check eingezogen werden.
 
 ## Empfohlene nächste Schritte
 

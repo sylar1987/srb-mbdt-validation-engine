@@ -95,6 +95,7 @@ class ApprovalWorkflow:
         actor: str,
         reason: str = "",
         metadata: Optional[Dict[str, Any]] = None,
+        acceptance_report: Optional[Any] = None,
     ) -> ApprovalEvent:
         if new_status not in ApprovalStatus.ALL:
             raise ValueError(f"unsupported approval status '{new_status}'")
@@ -108,10 +109,35 @@ class ApprovalWorkflow:
                 f"illegal transition {current} → {new_status} for {package_id}@{content_hash}; "
                 f"allowed: {allowed}"
             )
-        if new_status in (ApprovalStatus.APPROVED, ApprovalStatus.REJECTED) and not reason:
+        # Reason ist Pflicht für nachvollziehbare Endzustände — inkl.
+        # DEPRECATED, damit auch das Außerkraftsetzen begründet wird.
+        if new_status in (
+            ApprovalStatus.APPROVED,
+            ApprovalStatus.REJECTED,
+            ApprovalStatus.DEPRECATED,
+        ) and not reason:
             raise ValueError(f"transition to '{new_status}' requires a reason")
         if not actor:
             raise ValueError("actor is required for approval transitions")
+
+        merged_metadata: Dict[str, Any] = dict(metadata or {})
+
+        # Acceptance-Gate: wenn die Transition zu APPROVED erfolgt und ein
+        # ``acceptance_report`` mitgegeben wurde, müssen dessen Errors
+        # leer sein. Damit lässt sich der MetadataAcceptanceChecker direkt
+        # an den Approval-Schritt koppeln. Ohne Report bleibt das
+        # Verhalten kompatibel — die Verantwortung liegt dann beim Caller
+        # (siehe Convenience ``approve_if_accepted``).
+        if new_status == ApprovalStatus.APPROVED and acceptance_report is not None:
+            has_errors = getattr(acceptance_report, "has_errors", None)
+            if callable(has_errors) and has_errors():
+                raise ValueError(
+                    f"approval blocked for {package_id}@{content_hash}: "
+                    f"acceptance report has errors"
+                )
+            to_dict = getattr(acceptance_report, "to_dict", None)
+            if callable(to_dict):
+                merged_metadata.setdefault("acceptance_report", to_dict())
 
         event = ApprovalEvent(
             package_id=package_id,
@@ -120,11 +146,38 @@ class ApprovalWorkflow:
             to_status=new_status,
             actor=actor,
             reason=reason,
-            metadata=dict(metadata or {}),
+            metadata=merged_metadata,
         )
         self._status[key] = new_status
         self._events.append(event)
         return event
+
+    def approve_if_accepted(
+        self,
+        package_id: str,
+        content_hash: str,
+        actor: str,
+        reason: str,
+        acceptance_report: Any,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> ApprovalEvent:
+        """Convenience: nur freigeben, wenn der Acceptance-Report ok ist.
+
+        Wirft ``ValueError``, wenn der Report Errors enthält, und macht das
+        Acceptance-Gate damit zu einem expliziten Codeschritt statt zu
+        einer reinen Doku-Aussage.
+        """
+        if acceptance_report is None:
+            raise ValueError("approve_if_accepted requires an acceptance_report")
+        return self.transition(
+            package_id=package_id,
+            content_hash=content_hash,
+            new_status=ApprovalStatus.APPROVED,
+            actor=actor,
+            reason=reason,
+            metadata=metadata,
+            acceptance_report=acceptance_report,
+        )
 
     # -- queries ----------------------------------------------------------
     def status(self, package_id: str, content_hash: str) -> Optional[str]:

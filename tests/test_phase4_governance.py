@@ -25,6 +25,11 @@ from app.governance import (
 )
 from app.metadata.metadata_versioning import PackageDelta
 from app.models import MetadataPackage, RuleDefinitionV2
+from app.quality.metadata_acceptance import (
+    AcceptanceFinding,
+    AcceptanceReport,
+    MetadataAcceptanceChecker,
+)
 
 
 # --- ReleaseRegistry --------------------------------------------------------
@@ -86,6 +91,85 @@ def test_release_registry_blocks_overlapping_active_records() -> None:
                 status=ReleaseStatus.APPROVED,
             )
         )
+
+
+def test_release_registry_prefers_specific_over_generic() -> None:
+    """Framework-spezifische Releases müssen vor Generic-Releases gewählt werden."""
+    registry = ReleaseRegistry()
+    registry.register(
+        ReleaseRecord(
+            release_id="generic",
+            kind="package",
+            version="1.0",
+            framework_version="",
+            valid_from="2026-01-01",
+            valid_to="2026-12-31",
+            status=ReleaseStatus.APPROVED,
+        )
+    )
+    registry.register(
+        ReleaseRecord(
+            release_id="specific-4.2",
+            kind="package",
+            version="1.1",
+            framework_version="4.2",
+            valid_from="2026-01-01",
+            valid_to="2026-12-31",
+            status=ReleaseStatus.APPROVED,
+        )
+    )
+    chosen = registry.resolve("package", "2026-06-30", framework_version="4.2")
+    assert chosen.release_id == "specific-4.2"
+
+
+def test_release_registry_generic_is_fallback_when_no_specific() -> None:
+    """Ohne spezifischen Treffer fällt resolve auf einen Generic-Release zurück."""
+    registry = ReleaseRegistry()
+    registry.register(
+        ReleaseRecord(
+            release_id="generic",
+            kind="package",
+            version="1.0",
+            framework_version="",
+            valid_from="2026-01-01",
+            valid_to="2026-12-31",
+            status=ReleaseStatus.APPROVED,
+        )
+    )
+    chosen = registry.resolve("package", "2026-06-30", framework_version="4.2")
+    assert chosen.release_id == "generic"
+
+
+def test_release_registry_generic_and_specific_may_coexist() -> None:
+    """Generic und framework-spezifisch dürfen parallel registriert sein."""
+    registry = ReleaseRegistry()
+    registry.register(
+        ReleaseRecord(
+            release_id="generic",
+            kind="package",
+            version="1.0",
+            framework_version="",
+            valid_from="2026-01-01",
+            valid_to="2026-12-31",
+            status=ReleaseStatus.APPROVED,
+        )
+    )
+    # Spezifischer Release im selben Fenster darf trotzdem registriert werden.
+    registry.register(
+        ReleaseRecord(
+            release_id="specific-4.2",
+            kind="package",
+            version="1.1",
+            framework_version="4.2",
+            valid_from="2026-01-01",
+            valid_to="2026-12-31",
+            status=ReleaseStatus.APPROVED,
+        )
+    )
+    assert {r.release_id for r in registry.list("package")} == {
+        "generic",
+        "specific-4.2",
+    }
 
 
 def test_release_registry_skips_deprecated_releases() -> None:
@@ -176,6 +260,73 @@ def test_approval_workflow_ensure_approved_raises_for_other_hash() -> None:
         workflow.ensure_approved("PKG-4", "hash-4b")
 
 
+def test_approval_workflow_deprecation_requires_reason() -> None:
+    """DEPRECATED ist nachvollziehbar zu begründen."""
+    workflow = ApprovalWorkflow()
+    workflow.register("PKG-DEP", "hash-dep")
+    workflow.transition("PKG-DEP", "hash-dep", ApprovalStatus.VALIDATED, actor="a")
+    workflow.transition("PKG-DEP", "hash-dep", ApprovalStatus.REVIEWED, actor="b")
+    workflow.transition(
+        "PKG-DEP", "hash-dep", ApprovalStatus.APPROVED, actor="boss", reason="ok"
+    )
+    with pytest.raises(ValueError):
+        workflow.transition(
+            "PKG-DEP", "hash-dep", ApprovalStatus.DEPRECATED, actor="boss"
+        )
+    workflow.transition(
+        "PKG-DEP",
+        "hash-dep",
+        ApprovalStatus.DEPRECATED,
+        actor="boss",
+        reason="superseded by newer hash",
+    )
+
+
+def test_approval_workflow_blocks_approval_with_acceptance_errors() -> None:
+    """Approval mit fehlerhaftem AcceptanceReport muss blocken."""
+    workflow = ApprovalWorkflow()
+    workflow.register("PKG-AC", "hash-ac")
+    workflow.transition("PKG-AC", "hash-ac", ApprovalStatus.VALIDATED, actor="a")
+    workflow.transition("PKG-AC", "hash-ac", ApprovalStatus.REVIEWED, actor="b")
+
+    bad_report = AcceptanceReport(package_id="PKG-AC", framework_version="4.2")
+    bad_report.findings.append(
+        AcceptanceFinding("ACCEPT001", "ERROR", "framework_version missing")
+    )
+
+    with pytest.raises(ValueError):
+        workflow.transition(
+            "PKG-AC",
+            "hash-ac",
+            ApprovalStatus.APPROVED,
+            actor="boss",
+            reason="forced",
+            acceptance_report=bad_report,
+        )
+
+
+def test_approval_workflow_approve_if_accepted_passes_clean_report() -> None:
+    workflow = ApprovalWorkflow()
+    workflow.register("PKG-OK", "hash-ok")
+    workflow.transition("PKG-OK", "hash-ok", ApprovalStatus.VALIDATED, actor="a")
+    workflow.transition("PKG-OK", "hash-ok", ApprovalStatus.REVIEWED, actor="b")
+
+    checker = MetadataAcceptanceChecker(min_datapoints=0, min_templates=0)
+    package = MetadataPackage(package_id="PKG-OK", framework_version="4.2")
+    report = checker.check(package)
+    assert not report.has_errors()
+
+    event = workflow.approve_if_accepted(
+        "PKG-OK",
+        "hash-ok",
+        actor="boss",
+        reason="acceptance clean",
+        acceptance_report=report,
+    )
+    assert event.to_status == ApprovalStatus.APPROVED
+    assert "acceptance_report" in event.metadata
+
+
 def test_approval_workflow_rejection_requires_reason() -> None:
     workflow = ApprovalWorkflow()
     workflow.register("PKG-5", "hash-5")
@@ -224,6 +375,29 @@ def test_rule_review_registry_fingerprint_distinguishes_versions() -> None:
 
     assert registry.get(rule_v1) is not None
     assert registry.get(rule_v2) is None  # geänderte Regel braucht neuen Review
+
+
+def test_rule_review_fingerprint_invalidates_on_message_only_change() -> None:
+    """Reine ``message``-Änderung muss Review verwerfen (Konsistenz zu diff_rules)."""
+    rule_v1 = _rule("R1", message="alter Hinweis")
+    rule_v2 = _rule("R1", message="neuer Hinweis")
+
+    registry = RuleReviewRegistry()
+    registry.upsert(
+        rule_v1,
+        RuleReview(
+            rule_id="R1",
+            review_status=RuleReviewStatus.APPROVED,
+            test_status=RuleTestStatus.PASSED,
+        ),
+    )
+
+    assert registry.get(rule_v1) is not None
+    assert registry.get(rule_v2) is None
+
+    changes = diff_rules([rule_v1], [rule_v2])
+    assert changes and changes[0].change_type == "changed"
+    assert "message" in changes[0].fields_changed
 
 
 def test_rule_review_production_ready_filter() -> None:
@@ -316,6 +490,28 @@ def test_override_registry_activity_window_and_revocation() -> None:
     assert not registry.find_for_target(OverrideType.RULE, "R1", "2026-06-30")
     audit = registry.audit_log()
     assert audit and audit[0]["override_id"] == "O1"
+
+
+def test_override_registry_hides_revoked_without_reporting_date() -> None:
+    """Widerrufene Overrides dürfen auch ohne reporting_date nicht erscheinen."""
+    registry = OverrideRegistry()
+    registry.add(
+        OverrideEntry(
+            override_id="O1",
+            override_type=OverrideType.RULE,
+            target_id="R1",
+            reason="needed",
+            author="alice",
+        )
+    )
+    assert registry.find_for_target(OverrideType.RULE, "R1")
+    registry.revoke("O1", actor="bob", reason="no longer needed")
+    assert registry.find_for_target(OverrideType.RULE, "R1") == []
+    # Audit-Blick mit include_revoked=True liefert beide Modi.
+    audit_view = registry.find_for_target(
+        OverrideType.RULE, "R1", include_revoked=True
+    )
+    assert len(audit_view) == 1 and audit_view[0].revoked
 
 
 def test_override_registry_revoke_requires_reason() -> None:

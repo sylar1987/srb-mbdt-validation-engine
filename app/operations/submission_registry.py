@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 
 class SubmissionStatus:
@@ -46,11 +46,43 @@ class SubmissionRecord:
         return asdict(self)
 
 
-_TERMINAL = (SubmissionStatus.ACCEPTED,)
+# Terminalstatus: einmal erreicht, sind weitere Übergänge nicht erlaubt.
+# RESUBMITTED ist explizit kein Terminalstatus, sondern eine eigene
+# Ausnahme aus ACCEPTED heraus (z. B. EBA-Resubmission-Pfad).
+_TERMINAL = (SubmissionStatus.REJECTED,)
+
+# Streng definierte erlaubte Übergänge. Stilles Zurückkehren von
+# REJECTED → DRAFT → ACCEPTED wird damit ausgeschlossen; eine erneute
+# Einreichung erfolgt über eine neue Submission-ID.
+_ALLOWED_TRANSITIONS: Dict[str, Tuple[str, ...]] = {
+    SubmissionStatus.DRAFT: (
+        SubmissionStatus.READY,
+        SubmissionStatus.REJECTED,
+    ),
+    SubmissionStatus.READY: (
+        SubmissionStatus.SUBMITTED,
+        SubmissionStatus.DRAFT,
+        SubmissionStatus.REJECTED,
+    ),
+    SubmissionStatus.SUBMITTED: (
+        SubmissionStatus.ACCEPTED,
+        SubmissionStatus.REJECTED,
+    ),
+    SubmissionStatus.ACCEPTED: (
+        SubmissionStatus.RESUBMITTED,
+    ),
+    SubmissionStatus.RESUBMITTED: (),
+    SubmissionStatus.REJECTED: (),
+}
 
 
 class SubmissionRegistry:
-    """In-Memory-Registry mit kontrollierten Statusübergängen."""
+    """In-Memory-Registry mit kontrollierten Statusübergängen.
+
+    Die Übergangsmap ist konservativ: aus ``REJECTED`` führt kein Weg
+    zurück; eine korrigierte Einreichung erfordert eine neue Submission.
+    Aus ``ACCEPTED`` ist nur ``RESUBMITTED`` zulässig.
+    """
 
     def __init__(self) -> None:
         self._records: Dict[str, SubmissionRecord] = {}
@@ -65,9 +97,17 @@ class SubmissionRegistry:
         if new_status not in SubmissionStatus.ALL:
             raise ValueError(f"unsupported submission status '{new_status}'")
         record = self._must_get(submission_id)
-        if record.status in _TERMINAL and new_status != SubmissionStatus.RESUBMITTED:
+        if record.status in _TERMINAL:
             raise ValueError(
                 f"submission '{submission_id}' is in terminal status '{record.status}'"
+            )
+        allowed = _ALLOWED_TRANSITIONS.get(record.status, ())
+        if new_status == record.status:
+            return record
+        if new_status not in allowed:
+            raise ValueError(
+                f"illegal submission transition {record.status} → {new_status} "
+                f"for '{submission_id}'; allowed: {allowed}"
             )
         record.status = new_status
         record.updated_at = datetime.now(tz=timezone.utc).isoformat(timespec="seconds")

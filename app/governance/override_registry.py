@@ -122,11 +122,22 @@ class OverrideRegistry:
         override_type: str,
         target_id: str,
         reporting_date: Optional[str] = None,
+        include_revoked: bool = False,
     ) -> List[OverrideEntry]:
+        """Sucht Overrides für (override_type, target_id).
+
+        Widerrufene Einträge werden standardmäßig ausgeblendet — auch wenn
+        kein ``reporting_date`` übergeben wurde. ``include_revoked=True``
+        erlaubt einen expliziten Audit-Blick auf alle (auch widerrufenen)
+        Einträge; das ist nie der Default, damit produktive Aufrufer keine
+        widerrufene Ausnahme versehentlich anwenden.
+        """
         results = [
             entry for entry in self._entries.values()
             if entry.override_type == override_type and entry.target_id == target_id
         ]
+        if not include_revoked:
+            results = [entry for entry in results if not entry.revoked]
         if reporting_date is not None:
             results = [entry for entry in results if entry.is_active_on(reporting_date)]
         return results

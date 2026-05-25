@@ -124,6 +124,52 @@ def test_submission_registry_blocks_post_terminal_status() -> None:
     registry.update_status("sub-1", SubmissionStatus.RESUBMITTED)
 
 
+def test_submission_registry_rejects_silent_revival_from_rejected() -> None:
+    """REJECTED ist terminal — kein stilles REJECTED → DRAFT → ACCEPTED."""
+    registry = SubmissionRegistry()
+    registry.add(
+        SubmissionRecord(
+            submission_id="sub-x",
+            reporting_date="2026-03-31",
+            framework_version="4.2",
+            status=SubmissionStatus.REJECTED,
+        )
+    )
+    with pytest.raises(ValueError):
+        registry.update_status("sub-x", SubmissionStatus.DRAFT)
+    with pytest.raises(ValueError):
+        registry.update_status("sub-x", SubmissionStatus.ACCEPTED)
+
+
+def test_submission_registry_blocks_skip_from_draft_to_submitted() -> None:
+    """DRAFT → SUBMITTED (ohne READY) ist nicht erlaubt."""
+    registry = SubmissionRegistry()
+    registry.add(
+        SubmissionRecord(
+            submission_id="sub-y",
+            reporting_date="2026-03-31",
+            framework_version="4.2",
+        )
+    )
+    with pytest.raises(ValueError):
+        registry.update_status("sub-y", SubmissionStatus.SUBMITTED)
+
+
+def test_submission_registry_allows_ready_back_to_draft() -> None:
+    """Aus READY zurück nach DRAFT ist zulässig (Korrektur vor Einreichung)."""
+    registry = SubmissionRegistry()
+    registry.add(
+        SubmissionRecord(
+            submission_id="sub-z",
+            reporting_date="2026-03-31",
+            framework_version="4.2",
+        )
+    )
+    registry.update_status("sub-z", SubmissionStatus.READY)
+    registry.update_status("sub-z", SubmissionStatus.DRAFT)
+    assert registry.get("sub-z").status == SubmissionStatus.DRAFT
+
+
 # --- ResubmissionTracker ---------------------------------------------------
 
 
