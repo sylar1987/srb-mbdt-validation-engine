@@ -1,0 +1,2 @@
+template_id;name;description;datapoint_ids;dimensions
+B02.00;Reporting Entity Snapshot;Pilot template for Phase 3;DP_B02_C0010,DP_B02_C0020,DP_B02_C0030,DP_B02_C0040;ENTITY,PERIOD

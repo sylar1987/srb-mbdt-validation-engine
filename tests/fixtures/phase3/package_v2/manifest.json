@@ -1,0 +1,15 @@
+{
+  "package_id": "EBA-DPM-MINI-v2",
+  "framework_version": "4.2.1",
+  "release_date": "2026-04-15",
+  "hotfix": "HF-1",
+  "description": "Hotfix-Release: Currency-Codelist erweitert, neuer Datenpunkt c0050",
+  "files": {
+    "datapoints": "datapoints.csv",
+    "templates": "templates.csv",
+    "codelists": "codelists.csv",
+    "rules": "validation_rules.json",
+    "dimensions": "dimensions.csv",
+    "glossary": "glossary.json"
+  }
+}
